@@ -1,12 +1,10 @@
 The vertices of a triangle are at points (0, 0), (-1, 1), and (3, 3). What is the area of the triangle?
-A tech startup invests $8000 in software development in the first year, and then invests half of that amount in software development in the second year.
-What's the total amount the startup invested in software development over the two years?
+A tech startup invests $8000 in software development in the first year, and then invests half of that amount in software development in the second year. What's the total amount the startup invested in software development over the two years?
 In a survey conducted at a local high school, preferences for a new school color were measured: 58% of students liked the color blue, 45% preferred green, and 22% liked both colors. If we randomly pick a student from the school, what's the probability that they would like neither blue nor green?
 When rolling two dice, what is the probability that you roll a total number that is at least 3?
 Some people got on a bus at the terminal. At the first bus stop, half of the people got down and 4 more people got in. Then at the second bus stop, 6 people got down and 8 more got in. If there were a total of 25 people heading to the third stop, how many people got on the bus at the terminal?
 x+y = 4z, x*y = 4z^2, express x-y in z
 How many integers are in the solution of the inequality |x + 5| < 10
 When a number is divided by 10, the remainder is 4. What is the remainder when twice the number is divided by 4?
-Benjamin went to a bookstore and purchased a variety of books. He bought 5 copies of a sci-fi novel, each priced at $20, 3 copies of a history book priced at $30 each, and 2 copies of a philosophy book for $45 each.
-What was the total cost of his purchases?
+Benjamin went to a bookstore and purchased a variety of books. He bought 5 copies of a sci-fi novel, each priced at $20, 3 copies of a history book priced at $30 each, and 2 copies of a philosophy book for $45 each. What was the total cost of his purchases?
 Suppose Benjamin decides to sell each of these books at a 25% markup from the price he purchased them. What would be his total revenue if he sold all the books he bought?
