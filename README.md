@@ -23,6 +23,8 @@ nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine. It 
 
 🚧 **Coming Soon**: More updates and features are in development!
 
+- [2025.10] 🔥 We release the source code of nano-PEARL. Any PR is warmly welcomed!
+
 ## 📦 Installation
 
 Our nano-PEARL is built based on [nano-vllm](https://github.com/GeeeekExplorer/nano-vllm), and the installation is almost same with nano-vllm (only need to additionally install `rich` for colorful log). 🎨
@@ -55,16 +57,29 @@ pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
 - 🔄 **Draft-Target Disaggregation**: The draft model and the target model are loaded in separate devices, avoiding load-imbalance and resource competition.
 - ⚡ **Parallel Inference**: Both the draft model and the target model run inference in parallel, fully exploiting the GPU utilization!
 - 🎯 **Adaptive Draft Length**: 
-  - ✅ When the alignment is good, the draft model could generate draft tokens without being interrupted by the target model.
-  - ⚠️ When the alignment is poor, the target model could prevent the draft model from generating trash draft tokens.
+  - When the alignment is good, the draft model could generate draft tokens without being interrupted by the target model.
+  - When the alignment is poor, the target model could prevent the draft model from generating trash draft tokens.
 - 🤖 **Auto-Set Hyper-parameters**: Automatically configure optimal parameters for your hardware setup.
 - 🚀 **High Performance**: Built on CUDA Graphs and tensor parallelism for maximum throughput.
 - 💾 **Memory Efficient**: Prefix KV caching reduces memory usage while maintaining performance.
 
+## 📊 BenchMark Results
+
+Coming Soon!
+
+## 📋 TODOs
+
+- [ ]  **Dynamic TP Size**: Support dynamic TP size, including TP=6/7, hence the 8 GPUs can be fully used!
+- [ ]  **Draft Model Temperature**: Support setting a non-zero temperature for the draft model.
+- [ ]  **Continuous Batching**: Support continuous batching and chunked prefill.
+
+## 🐛 Bug Fixing
+Coming Soon!
 
 ## 🙏 Acknowledgements
 
-TBD.
+
+This project has been influenced by many execellent projects in the LLM community, such as [nano-vllm](https://github.com/GeeeekExplorer/nano-vllm) and [PEARL](https://github.com/smart-lty/ParallelSpeculativeDecoding). The nano-PEARL logo is designed by Veo 3. 
 
 ## 📚 Citation
 ```bibtex
