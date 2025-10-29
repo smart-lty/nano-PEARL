@@ -431,6 +431,42 @@ class ModelRunnerBase:
             
         dist.barrier()
 
+    def pearl_bench_generate(self, num_pearl_steps: int = 100):
+        """
+        Benchmark the real-world throughput of the PEARL algorithm.
+        For speculative decoding, either setting the max tokens or ignore eos tokens is not fair! 
+        As there always exists some seqs that have higher MAT and early finished.
+        Therefore, we must set a fixed PEARL steps to ensure, all the sequences are running at any time, no sequence is early finished.
+        """
+        dist.barrier()
+        torch.cuda.synchronize()
+        start_time = time.time()
+        self.prefill()
+
+        # set max tokens to a large value to ensure all the sequences are running at any time
+        for seq in self.scheduler.running:
+            seq.max_tokens = 1e8
+            seq.ignore_eos = True
+        if self.gamma == -1:
+            self.gamma = self.gamma_list[next(x for x in self.gamma_list if x >= len(self.scheduler.running))]
+
+        for _ in range(num_pearl_steps):
+            self.pearl_step()
+
+        torch.cuda.synchronize()
+        end_time = time.time()
+        seqs = self.scheduler.running
+        output = [(seq.seq_id, seq.completion_token_ids, seq.num_acc_tokens) for seq in seqs]
+        self.scheduler.running.clear()
+
+        if self.rank == self.global_config.target_config.master_rank:
+            data = pickle.dumps([output, end_time - start_time])
+            n = len(data)
+            self.shm.buf[0:4] = n.to_bytes(4, "little")
+            self.shm.buf[4:n+4] = data
+            
+        dist.barrier()
+
     @abstractmethod
     def pearl_step(self):
         pass

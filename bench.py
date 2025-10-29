@@ -77,7 +77,7 @@ if __name__ == "__main__":
     for prompt in prompts:
         engine.add_request(prompt, copy.deepcopy(sampling_params))
 
-    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate()
+    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.bench_generate(num_pearl_steps=100)
     MAT = [sum(n) / len(n) for n in num_acc_tokens]
 
     if args.verbose:
@@ -86,6 +86,7 @@ if __name__ == "__main__":
             logger.info(f"Completion: \n{output_text}")
 
     PEARL_throughput = sum(num_tokens) / elapsed_time
+    logger.info(f"num_tokens: {num_tokens}, MAT: {MAT}")
     logger.info(f"[PEARL Generate] Batch Size: {len(prompts)} Total: {sum(num_tokens)}tok, Time: {elapsed_time:.2f}s, Throughput: {sum(num_tokens) / elapsed_time:.2f}tok/s, MAT: {MAT}")
 
     if args.run_ar_benchmark:
