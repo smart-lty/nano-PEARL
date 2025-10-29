@@ -56,7 +56,6 @@ class ModelRunnerBase:
         dist.init_process_group("nccl", 
                                 f"tcp://localhost:2333", 
                                 world_size=self.global_config.world_size,
-                                device_id=self.rank,
                                 rank=self.rank)
         draft_group = dist.new_group(self.global_config.draft_config.devices)
         target_group = dist.new_group(self.global_config.target_config.devices)
