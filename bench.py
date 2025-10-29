@@ -38,7 +38,6 @@ def parse_args():
     return parser.parse_args()
 
 def get_default_prompts():
-    """从文件读取默认提示词"""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     prompts_file = os.path.join(script_dir, 'static', 'default_prompts.txt')
     with open(prompts_file, 'r', encoding='utf-8') as f:
@@ -60,7 +59,7 @@ if __name__ == "__main__":
     )
     engine = PEARLEngine(config)
 
-    # 固定 warmup
+    # warmup
     prompt = "Benchmark:"
     sampling_params = SamplingParams(temperature=0, ignore_eos=False, max_tokens=512)
     engine.add_request(prompt, sampling_params)
