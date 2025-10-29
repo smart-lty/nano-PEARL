@@ -42,9 +42,9 @@ class PEARLConfig:
     target_tensor_parallel_size: int = 2
     draft_group_name: str = "draft_group"
     target_group_name: str = "target_group"
-    max_num_batched_tokens: int = 16384 * 2
+    max_num_batched_tokens: int = 16384
     max_num_seqs: int = 512
-    max_model_len: int = 9192
+    max_model_len: int = 4096
     gpu_memory_utilization: float = 0.9
     kvcache_block_size: int = 256
     num_kvcache_blocks: int = -1
