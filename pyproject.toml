@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nano-PEARL"
+version = "0.1.0"
+authors = [{ name = "Tianyu Liu" }]
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+description = "A lightweight parallel speculative decoding implementation in nano-vllm style."
+requires-python = ">=3.12"
+
+dependencies = [
+    "torch>=2.4.0",
+    "triton>=3.0.0",
+    "transformers>=4.51.0",
+    "flash-attn",
+    "xxhash",
+    "rich>=14.1.0",
+]
+
+[project.urls]
+Homepage="https://github.com/smart-lty/nano-PEARL"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["nano_pearl*"]
+
+[tool.uv.extra-build-dependencies]
+flash-attn = ["torch"]
