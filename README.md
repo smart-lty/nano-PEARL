@@ -91,14 +91,15 @@ See `bench.py` for benchmark.
 
 ## ⚙️ Implementation Details
 
-The core configuration of `nano-PEARL` is split into two main classes:
+## ⚙️ Implementation Details
 
-1.  **`PEARLConfig`**: Defined in `pearl_config.py`, this is used for **engine initialization**. It manages models, parallel settings, memory allocation, and batching strategies.
-2.  **`SamplingParams`**: This is used when **submitting a request**. It controls the sampling behavior (like temperature, `max_tokens`, etc.) for a single generation task.
+The core configuration of `nano-PEARL` is split into two main classes.
 
 ---
 
-### 1. PEARLConfig (Engine Configuration)
+### 1. `PEARLConfig` (Engine Configuration)
+
+**File Location:** `nano_pearl/pearl_config.py`
 
 This is the most important configuration object, passed when initializing the `PEARLEngine`.
 
@@ -128,9 +129,11 @@ This is the most important configuration object, passed when initializing the `P
 * `max_model_len: int`
     * **Description**: The maximum context length supported by the model (including prompt and generated tokens).
 * `kvcache_block_size: int`
-    * **Description**: The block size for the KVCache in paged-attention. The default of `256` is suitable for most cases.
+    * **Description**: The block size for the KVCache in paged-attention.
+    * **Recommendation**: The default of `256` is suitable for most cases.
 * `num_kvcache_blocks: int`
-    * **Description**: The total number of KVCache blocks. If set to `-1` (default), the engine will automatically calculate the maximum number of blocks based on `gpu_memory_utilization`.
+    * **Description**: The total number of KVCache blocks.
+    * **Recommendation**: If set to `-1` (default), the engine will automatically calculate the maximum number of blocks based on `gpu_memory_utilization`.
 
 #### 🧠 Algorithm & Engine Parameters
 
@@ -138,8 +141,26 @@ This is the most important configuration object, passed when initializing the `P
     * **Description**: This is the **window size for adaptive draft length** in the PEARL algorithm, i.e., how many tokens the draft model "looks ahead" at one time.
     * **Recommendation**: Set to `-1` (default) to enable **auto-setting**. The engine will automatically select a near-optimal value based on the model configuration.
 * `enforce_eager: bool`
-    * **Description**: Whether to force Eager mode.
-    * **Recommendation**: Keep as `False` (default) to enable CUDA Graphs for maximum performance. Only set to `True` for debugging purposes.
+    * **Description**: Whether to force Eager mode, disabling CUDA Graphs.
+    * **Recommendation**: Keep as `False` (default) for maximum performance. Only set to `True` for debugging purposes.
+
+---
+
+### 2. `SamplingParams` (Request Configuration)
+
+**File Location:** Imported from the top-level `nano_pearl` package.
+
+These parameters are passed during `engine.add_request()` to control the generation behavior for a **single request**.
+
+* `temperature: float`
+    * **Description**: The sampling temperature. `0.0` indicates greedy sampling, which is used in `example.py` and benchmarks for deterministic outputs.
+    * **Recommendation**: Use `0.0` for deterministic output or benchmarks. Use `> 0.0` (e.g., `0.7`) for creative tasks.
+* `max_tokens: int`
+    * **Description**: The maximum number of new tokens to generate for this request.
+    * **Recommendation**: Set to a reasonable limit (e.g., `256`, `512`, `1024`) to prevent runaway generations.
+* `ignore_eos: bool`
+    * **Description**: If `True`, the generation process will ignore the EOS (End-of-Sentence) token and continue until `max_tokens` is reached.
+    * **Recommendation**: Keep as `False` (default) unless you specifically need to generate a fixed number of tokens.
 
 
 ## 📋 TODOs
