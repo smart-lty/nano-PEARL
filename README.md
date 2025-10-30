@@ -23,33 +23,6 @@ nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine. It 
 
 - [2025.10] 🔥 We release the source code of nano-PEARL. Any PR is warmly welcomed!
 
-## 📦 Installation
-
-Our nano-PEARL is built based on [nano-vllm](https://github.com/GeeeekExplorer/nano-vllm), and the installation is almost same with nano-vllm (only need to additionally install `rich` for colorful log). 🎨
-
-
-First create an environment with `python>=3.12`:
-```shell
-conda create -n nano-pearl python=3.12 -y
-conda activate nano-pearl
-```
-
-Then, install packages with `uv` or `pip`:
-
-**From source:**
-```shell
-uv pip install -e . # from current path
-```
-
-**From GitHub:**
-```shell
-pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
-```
-⚠️ When you directly use pip for installation, you may encounter that build flash-attn needs torch installed. In this case, you should **install torch first**, and then re-run the installation command.
-
-⚠️ If the installation of flash-attn is very slow, we strongly recommend you to download a whl file and **build flash attn from wheel**.
-
-
 ## ✨ Key Features
 
 - 🔄 **Draft-Target Disaggregation**: The draft model and the target model are loaded in separate devices, avoiding load-imbalance and resource competition.
@@ -60,6 +33,34 @@ pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
 - 🤖 **Auto-Set Hyper-parameters**: Automatically configure optimal parameters for your hardware setup.
 - 🚀 **High Performance**: Built on CUDA Graphs and tensor parallelism for maximum throughput.
 - 💾 **Memory Efficient**: Prefix KV caching reduces memory usage while maintaining performance.
+
+
+## 📦 Installation
+
+Our nano-PEARL is built based on [nano-vllm](https://github.com/GeeeekExplorer/nano-vllm), and the installation is almost same with nano-vllm (only need to additionally install `rich` for colorful log). 🎨
+
+First create an environment with `python>=3.12`:
+```shell
+conda create -n nano-pearl python=3.12 -y
+conda activate nano-pearl
+```
+
+Then, install packages with `uv` or `pip`:
+**From source:**
+```shell
+uv pip install -e . # from current path
+```
+
+**From GitHub:**
+```shell
+pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
+```
+<details><summary><b>Some hints for potential problem solving</b></summary>
+
+> ⚠️ When you directly use pip for installation, you may encounter that build flash-attn needs torch installed. In this case, you should **install torch first**, and then re-run the installation command.
+
+> ⚠️ If the installation of flash-attn is very slow, we strongly recommend you to download a whl file and **build flash attn from wheel**.
+</details>
 
 ## 🚀 Quick Start
 
