@@ -346,7 +346,7 @@ class ModelRunnerBase:
         torch.cuda.empty_cache()
         torch.cuda.reset_peak_memory_stats()
 
-        bs = [1, 2, 4, 8, 16, 32, 64]
+        bs = [1, 2, 4, 8, 16, 32]
         speed = torch.zeros(len(bs), dtype=torch.float32, device="cuda")
         for idx in trange(len(bs), desc="Auto Set Gamma", disable=self.rank != 0):
             seqs = [Sequence([0] * (self.global_config.max_model_len // (bs[idx] + 1))) for _ in range(bs[idx])]
@@ -363,9 +363,7 @@ class ModelRunnerBase:
                 bs_speed.append(1 / (end_time - start_time))
             bs_speed = bs_speed[5:]
             speed[idx] = sum(bs_speed) / len(bs_speed)
-            self.scheduler.waiting.clear()
-            self.scheduler.running.clear()
-            self.scheduler.finished.clear()
+            self.clear_requests()
         
         global_speed = torch.zeros((self.global_config.world_size, len(bs)), dtype=torch.float32, device="cuda")
         global_speed[self.rank] = speed
@@ -382,6 +380,10 @@ class ModelRunnerBase:
 
         reset_context(self.tp_params)
         torch.cuda.empty_cache()
+
+    def clear_requests(self):
+        self.scheduler.clear()
+        dist.barrier()
 
     def parallel_generate(self):
         dist.barrier()
@@ -402,7 +404,7 @@ class ModelRunnerBase:
             self.shm.buf[0:4] = n.to_bytes(4, "little")
             self.shm.buf[4:n+4] = data
         
-        dist.barrier()
+        self.clear_requests()
 
     def pearl_generate(self):
         dist.barrier()
@@ -421,7 +423,6 @@ class ModelRunnerBase:
         end_time = time.time()
         seqs = self.scheduler.finished
         output = [(seq.seq_id, seq.completion_token_ids, seq.num_acc_tokens) for seq in seqs]
-        self.scheduler.finished.clear()
 
         if self.rank == self.global_config.target_config.master_rank:
             data = pickle.dumps([output, end_time - start_time])
@@ -429,7 +430,7 @@ class ModelRunnerBase:
             self.shm.buf[0:4] = n.to_bytes(4, "little")
             self.shm.buf[4:n+4] = data
             
-        dist.barrier()
+        self.clear_requests()
 
     def pearl_bench_generate(self, num_pearl_steps: int = 100):
         """
@@ -456,8 +457,12 @@ class ModelRunnerBase:
         torch.cuda.synchronize()
         end_time = time.time()
         seqs = self.scheduler.running
+        
+        for seq in seqs:
+            # acc tokens are not properly appended in the pearl_step function, so we append it here.
+            seq.num_acc_tokens.append(seq.cur_acc_tokens)
+
         output = [(seq.seq_id, seq.completion_token_ids, seq.num_acc_tokens) for seq in seqs]
-        self.scheduler.running.clear()
 
         if self.rank == self.global_config.target_config.master_rank:
             data = pickle.dumps([output, end_time - start_time])
@@ -465,7 +470,7 @@ class ModelRunnerBase:
             self.shm.buf[0:4] = n.to_bytes(4, "little")
             self.shm.buf[4:n+4] = data
             
-        dist.barrier()
+        self.clear_requests()
 
     @abstractmethod
     def pearl_step(self):
