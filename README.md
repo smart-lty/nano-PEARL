@@ -141,35 +141,6 @@ This is the most important configuration object, passed when initializing the `P
     * **Description**: Whether to force Eager mode.
     * **Recommendation**: Keep as `False` (default) to enable CUDA Graphs for maximum performance. Only set to `True` for debugging purposes.
 
----
-
-### 2. SamplingParams (Request Configuration)
-
-These parameters are passed during `engine.add_request()` to control the generation behavior for a **single request**.
-
-* `temperature: float`
-    * **Description**: The sampling temperature. `0.0` indicates greedy sampling, which is used in `example.py` and benchmarks for deterministic outputs.
-* `max_tokens: int`
-    * **Description**: The maximum number of new tokens to generate for this request.
-* `ignore_eos: bool`
-    * **Description**: If `True`, the generation process will ignore the EOS (End-of-Sentence) token and continue until `max_tokens` is reached.
-
----
-
-### 3. Engine Generate Output
-
-A call to `engine.generate()` returns a tuple with 4 elements:
-
-1.  `output_text: list[str]`
-    * **Description**: A list of the generated text strings for each request in the batch.
-2.  `num_tokens: list[int]`
-    * **Description**: A list of the **total number of new tokens actually generated** for each request.
-3.  `num_acc_tokens: list[list[int]]`
-    * **Description**: **[Key Spec-Dec Metric]** A nested list. The outer list corresponds to each request. The inner list records the **number of tokens accepted at each verification step**.
-    * **Example**: `[[5, 4, 6, 2]]` means the first request had 4 verification steps, accepting 5, 4, 6, and 2 tokens, respectively.
-    * **Usage**: `sum(num_acc_tokens[0]) / len(num_acc_tokens[0])` (as shown in `example.py`) is used to calculate the **Mean Acceptance Tokens (MAT)**.
-4.  `elapsed_time: float`
-    * **Description**: The total time in seconds spent processing the entire batch.
 
 ## 📋 TODOs
 
