@@ -62,6 +62,62 @@ pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
 - 🤖 **Auto-Set Hyper-parameters**: Automatically configure optimal parameters for your hardware setup.
 - 🚀 **High Performance**: Built on CUDA Graphs and tensor parallelism for maximum throughput.
 - 💾 **Memory Efficient**: Prefix KV caching reduces memory usage while maintaining performance.
+- 
+## 🚀 Quick Start
+
+The `nano-PEARL` API mirrors `vLLM` / `nano-vllm`'s interface. The main difference is in the `LLM` engine initialization, where you must **specify both a target model and a draft model**, along with their respective tensor-parallel (TP) sizes.
+
+Here is a minimal example of running parallel speculative decoding on 8 GPUs (e.g., 4 for the target model, 4 for the draft model):
+
+```python
+import torch
+from nano_pearl import LLM, SamplingParams
+
+# 1. Define your models
+# The large, accurate model
+target_model = "meta-llama/Llama-3-8B-Instruct" 
+# The small, fast model
+draft_model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+
+# 2. Configure the parallel setup
+# (Example: 8 GPUs total)
+target_tp_size = 4
+draft_tp_size = 4
+
+# 3. Initialize the nano-PEARL engine
+# The engine handles device placement automatically.
+llm = LLM(
+    target_model=target_model,
+    draft_model=draft_model,
+    target_tensor_parallel_size=target_tp_size,
+    draft_tensor_parallel_size=draft_tp_size
+)
+
+# 4. Set sampling parameters (same as vLLM)
+sampling_params = SamplingParams(
+    temperature=0.7, 
+    top_p=0.95,
+    max_tokens=512
+)
+
+# 5. Prepare prompts
+prompts = [
+    "Explain speculative decoding in one sentence:",
+    "What is the capital of France?",
+    "A good name for a parallel speculative decoding engine is"
+]
+
+# 6. Run generation
+print("Running generation...")
+outputs = llm.generate(prompts, sampling_params)
+
+# 7. Print the results (output format is vLLM-compatible)
+print("\n--- Results ---")
+for output in outputs:
+    prompt = output.prompt
+    generated_text = output.outputs[0].text
+    print(f"🚀 Prompt: {prompt}")
+    print(f"✅ Generated: {generated_text}\n")
 
 ## 📊 BenchMark Results
 
