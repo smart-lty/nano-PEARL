@@ -9,15 +9,15 @@
 [![ArXiv](https://img.shields.io/badge/arXiv-2408.11850-b31b1b)](https://arxiv.org/abs/2408.11850)
 [![Conference](https://img.shields.io/badge/ICLR-2025-4B7BEC)](#)
 
-<em>A lightweight parallel speculative decoding implementation in nano-vllm style.<br></em>
+<em>A <strong>high-throughput</strong> parallel speculative decoding engine in nano-vllm style.<br></em>
 
 </div>
 
 # 🚀 nano-PEARL
 
-> **A lightweight parallel speculative decoding implementation in nano-vllm style**
+> **A high-throughput parallel speculative decoding engine in nano-vllm style**
 
-nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine. It decouples Draft and Target models onto separate device groups and runs them concurrently with on-the-fly verification, prefix KV caching, CUDA Graphs, and tensor parallelism — aiming for high throughput without sacrificing output quality.
+nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine. It decouples Draft and Target models onto separate device groups and runs them concurrently with on-the-fly verification, prefix KV caching, CUDA Graphs, page attention, flash attention and tensor parallelism — aiming for high throughput without sacrificing output quality.
 
 ## 🎉 Latest News
 
@@ -72,6 +72,7 @@ Coming Soon!
 - [ ]  **Dynamic TP Size**: Support dynamic TP size, including TP=6/7, hence the 8 GPUs can be fully used!
 - [ ]  **Draft Model Temperature**: Support setting a non-zero temperature for the draft model.
 - [ ]  **Continuous Batching**: Support continuous batching and chunked prefill.
+- [ ]  **Aligend Models**: Support finetuned models for PEARL(qwen3).
 
 ## 🐛 Bug Fixing
 Coming Soon!
