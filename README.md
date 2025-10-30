@@ -88,7 +88,7 @@ def main():
 
 ## 📊 BenchMark Results
 
-Coming Soon! See `bench.py` for benchmark.
+Coming Soon!
 
 ## 📋 TODOs
 
