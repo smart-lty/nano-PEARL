@@ -70,54 +70,20 @@ The `nano-PEARL` API mirrors `vLLM` / `nano-vllm`'s interface. The main differen
 Here is a minimal example of running parallel speculative decoding on 8 GPUs (e.g., 4 for the target model, 4 for the draft model):
 
 ```python
-import torch
-from nano_pearl import LLM, SamplingParams
+from nano_pearl import PEARLConfig, PEARLEngine, SamplingParams, logger
 
-# 1. Define your models
-# The large, accurate model
-target_model = "meta-llama/Llama-3-8B-Instruct" 
-# The small, fast model
-draft_model = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-
-# 2. Configure the parallel setup
-# (Example: 8 GPUs total)
-target_tp_size = 4
-draft_tp_size = 4
-
-# 3. Initialize the nano-PEARL engine
-# The engine handles device placement automatically.
-llm = LLM(
-    target_model=target_model,
-    draft_model=draft_model,
-    target_tensor_parallel_size=target_tp_size,
-    draft_tensor_parallel_size=draft_tp_size
-)
-
-# 4. Set sampling parameters (same as vLLM)
-sampling_params = SamplingParams(
-    temperature=0.7, 
-    top_p=0.95,
-    max_tokens=512
-)
-
-# 5. Prepare prompts
-prompts = [
-    "Explain speculative decoding in one sentence:",
-    "What is the capital of France?",
-    "A good name for a parallel speculative decoding engine is"
-]
-
-# 6. Run generation
-print("Running generation...")
-outputs = llm.generate(prompts, sampling_params)
-
-# 7. Print the results (output format is vLLM-compatible)
-print("\n--- Results ---")
-for output in outputs:
-    prompt = output.prompt
-    generated_text = output.outputs[0].text
-    print(f"🚀 Prompt: {prompt}")
-    print(f"✅ Generated: {generated_text}\n")
+def main():
+    draft_model_path = "/path/to/draft/model"
+    target_model_path = "/path/to/target/model"
+    
+    config = PEARLConfig(draft_model_path, target_model_path, draft_tensor_parallel_size=1, target_tensor_parallel_size=1, gpu_memory_utilization=0.9)
+    engine = PEARLEngine(config)
+    
+    prompt = "Explain quantum computing in simple terms"
+    sampling_params = SamplingParams(temperature=0.0, max_tokens=256, ignore_eos=False)
+    engine.add_request(prompt, sampling_params)
+    
+    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate() 
 
 ## 📊 BenchMark Results
 
