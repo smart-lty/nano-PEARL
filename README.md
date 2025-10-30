@@ -89,6 +89,88 @@ def main():
 
 See `bench.py` for benchmark.
 
+## ⚙️ Implementation Details
+
+The core configuration of `nano-PEARL` is split into two main classes:
+
+1.  **`PEARLConfig`**: Defined in `pearl_config.py`, this is used for **engine initialization**. It manages models, parallel settings, memory allocation, and batching strategies.
+2.  **`SamplingParams`**: This is used when **submitting a request**. It controls the sampling behavior (like temperature, `max_tokens`, etc.) for a single generation task.
+
+---
+
+### 1. PEARLConfig (Engine Configuration)
+
+This is the most important configuration object, passed when initializing the `PEARLEngine`.
+
+#### 📦 Model & Parallelism Parameters
+
+* `draft_model_path: str`
+    * **Description**: The path to the draft model (small model). Can be a local path or a Hugging Face hub repository name.
+* `target_model_path: str`
+    * **Description**: The path to the target model (large model).
+* `draft_tensor_parallel_size: int`
+    * **Description**: The tensor-parallel (TP) size allocated for the **draft model**. For example, `1` means the draft model will be loaded entirely onto a single GPU.
+* `target_tensor_parallel_size: int`
+    * **Description**: The tensor-parallel (TP) size allocated for the **target model**.
+    * **Constraint**: The sum `draft_tensor_parallel_size + target_tensor_parallel_size` must be less than or equal to the total number of available GPUs (currently supports up to 8).
+
+#### 💾 Memory & Batching Parameters
+
+* `gpu_memory_utilization: float`
+    * **Description**: A value between `0.0` and `1.0` representing the fraction of GPU memory to be used for the KV Cache. This is the **key parameter** for controlling memory usage.
+    * **Recommendation**: `0.9` (90%) is a safe and efficient starting point.
+* `max_num_batched_tokens: int`
+    * **Description**: The maximum total number of tokens (i.e., `batch_size * sequence_length`) that the engine can process in a single batch.
+    * **Recommendation**: `16384` for 80GB GPUs (H100/A100); `8192` for 40GB GPUs.
+* `max_num_seqs: int`
+    * **Description**: The maximum number of sequences (requests) the engine can process concurrently.
+    * **Recommendation**: `512` for 80GB GPUs; `128` or `256` for 40GB GPUs.
+* `max_model_len: int`
+    * **Description**: The maximum context length supported by the model (including prompt and generated tokens).
+* `kvcache_block_size: int`
+    * **Description**: The block size for the KVCache in paged-attention. The default of `256` is suitable for most cases.
+* `num_kvcache_blocks: int`
+    * **Description**: The total number of KVCache blocks. If set to `-1` (default), the engine will automatically calculate the maximum number of blocks based on `gpu_memory_utilization`.
+
+#### 🧠 Algorithm & Engine Parameters
+
+* `gamma: int`
+    * **Description**: This is the **window size for adaptive draft length** in the PEARL algorithm, i.e., how many tokens the draft model "looks ahead" at one time.
+    * **Recommendation**: Set to `-1` (default) to enable **auto-setting**. The engine will automatically select a near-optimal value based on the model configuration.
+* `enforce_eager: bool`
+    * **Description**: Whether to force Eager mode.
+    * **Recommendation**: Keep as `False` (default) to enable CUDA Graphs for maximum performance. Only set to `True` for debugging purposes.
+
+---
+
+### 2. SamplingParams (Request Configuration)
+
+These parameters are passed during `engine.add_request()` to control the generation behavior for a **single request**.
+
+* `temperature: float`
+    * **Description**: The sampling temperature. `0.0` indicates greedy sampling, which is used in `example.py` and benchmarks for deterministic outputs.
+* `max_tokens: int`
+    * **Description**: The maximum number of new tokens to generate for this request.
+* `ignore_eos: bool`
+    * **Description**: If `True`, the generation process will ignore the EOS (End-of-Sentence) token and continue until `max_tokens` is reached.
+
+---
+
+### 3. Engine Generate Output
+
+A call to `engine.generate()` returns a tuple with 4 elements:
+
+1.  `output_text: list[str]`
+    * **Description**: A list of the generated text strings for each request in the batch.
+2.  `num_tokens: list[int]`
+    * **Description**: A list of the **total number of new tokens actually generated** for each request.
+3.  `num_acc_tokens: list[list[int]]`
+    * **Description**: **[Key Spec-Dec Metric]** A nested list. The outer list corresponds to each request. The inner list records the **number of tokens accepted at each verification step**.
+    * **Example**: `[[5, 4, 6, 2]]` means the first request had 4 verification steps, accepting 5, 4, 6, and 2 tokens, respectively.
+    * **Usage**: `sum(num_acc_tokens[0]) / len(num_acc_tokens[0])` (as shown in `example.py`) is used to calculate the **Mean Acceptance Tokens (MAT)**.
+4.  `elapsed_time: float`
+    * **Description**: The total time in seconds spent processing the entire batch.
+
 ## 📋 TODOs
 
 - [ ]  **Dynamic TP Size**: Support dynamic TP size, including TP=6/7, hence the 8 GPUs can be fully used!
