@@ -94,6 +94,7 @@ Coming Soon!
 - [ ]  **Dynamic TP Size**: Support dynamic TP size, including TP=6/7, hence the 8 GPUs can be fully used!
 - [ ]  **Draft Model Temperature**: Support setting a non-zero temperature for the draft model.
 - [ ]  **Continuous Batching**: Support continuous batching and chunked prefill.
+- [ ]  **Adaptive Gamma**: Support dynamic `gamma` tuning based on context size and model's performance.
 - [ ]  **PEARL-2**: Support fine-tuning / distilling a PEARL-specific draft model for further acceleration.
 
 ## 🐛 Bug Fixing
