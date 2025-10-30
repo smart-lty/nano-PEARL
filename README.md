@@ -9,13 +9,11 @@
 [![ArXiv](https://img.shields.io/badge/arXiv-2408.11850-b31b1b)](https://arxiv.org/abs/2408.11850)
 [![Conference](https://img.shields.io/badge/ICLR-2025-4B7BEC)](#)
 
-<em>A lightweight parallel speculative decoding implementation in nano-vllm style.<br></em>
+<em><strong>Unleashing Batch Throughput: </strong><br>Reimagined Speculative Decoding with Parallelism and Adaptive Draft Length<br></em>
 
 </div>
 
 # 🚀 nano-PEARL
-
-> **A lightweight parallel speculative decoding implementation in nano-vllm style**
 
 nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine. It decouples Draft and Target models onto separate device groups and runs them concurrently with on-the-fly verification, prefix KV caching, CUDA Graphs, and tensor parallelism — aiming for high throughput without sacrificing output quality.
 
