@@ -40,6 +40,8 @@ def parse_args():
     # Generation arguments
     parser.add_argument('--temperature', '-temp', type=float, default=0.0,
                        help='Sampling temperature (default: 0.0)')
+    parser.add_argument('--num-pearl-steps', type=int, default=100, 
+                       help='Number of PEARL steps for bench_generate in evaluation (default: 100)')
     parser.add_argument('--max-tokens', type=int, default=200,
                        help='Maximum tokens to generate (default: 200)')
     parser.add_argument('--ignore-eos', '-noeos', action='store_true',
@@ -73,7 +75,7 @@ def generate_random_inputs(num_samples: int, input_len: int) -> List[List[int]]:
 
 
 def run_benchmark(engine: PEARLEngine, inputs: List[List[int]], sampling_params: SamplingParams, 
-                 batch_size: int = 1, run_ar: bool = False) -> Tuple[List[List[int]], Dict[str, float], float]:
+                 batch_size: int = 1, run_ar: bool = False, num_pearl_steps: int = 100) -> Tuple[List[List[int]], Dict[str, float], float]:
     """Run benchmark test with random inputs"""
     logger.info(f"Starting evaluation with {len(inputs)} random samples, batch size: {batch_size}")
     
@@ -97,7 +99,7 @@ def run_benchmark(engine: PEARLEngine, inputs: List[List[int]], sampling_params:
             engine.add_request(input_ids, copy.deepcopy(sampling_params))
         
         # PEARL generation
-        output_text, num_tokens, num_acc_tokens, elapsed_time = engine.bench_generate(num_pearl_steps=100)
+        output_text, num_tokens, num_acc_tokens, elapsed_time = engine.bench_generate(num_pearl_steps=num_pearl_steps)
         # Accumulate results
         all_outputs.extend(output_text)
         all_num_tokens.extend(num_tokens)
@@ -198,7 +200,7 @@ def main():
     
     # Run benchmark test
     outputs, metrics, elapsed_time = run_benchmark(
-        engine, inputs, sampling_params, args.bs, args.run_ar_benchmark
+        engine, inputs, sampling_params, args.bs, args.run_ar_benchmark, args.num_pearl_steps
     )
     
     # Print results to console

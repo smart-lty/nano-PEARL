@@ -37,6 +37,8 @@ def parse_args():
                        help='Sampling temperature (default: 0.0)')
     parser.add_argument('--max-tokens', type=int, default=200,
                        help='Maximum tokens to generate (default: 200)')
+    parser.add_argument('--num-pearl-steps', type=int, default=100, 
+                       help='Number of PEARL steps for bench_generate in evaluation (default: 100)')
     parser.add_argument('--ignore-eos', '-noeos', action='store_true',
                        help='Ignore EOS token (default: False)')
     
@@ -87,7 +89,7 @@ def extract_prompts(data: List[Dict[str, Any]], dataset_name: str) -> List[str]:
 
 
 def run_benchmark(engine: PEARLEngine, prompts: List[str], sampling_params: SamplingParams, 
-                 dataset_name: str, batch_size: int = 1, run_ar: bool = False) -> Tuple[List[str], Dict[str, float], float]:
+                 dataset_name: str, batch_size: int = 1, run_ar: bool = False, num_pearl_steps: int = 100) -> Tuple[List[str], Dict[str, float], float]:
     """Run benchmark test"""
     logger.info(f"Starting evaluation of {dataset_name} dataset, sample count: {len(prompts)}, batch size: {batch_size}")
     
@@ -111,7 +113,7 @@ def run_benchmark(engine: PEARLEngine, prompts: List[str], sampling_params: Samp
             engine.add_request(prompt, copy.deepcopy(sampling_params))
         
         # PEARL generation
-        output_text, num_tokens, num_acc_tokens, elapsed_time = engine.bench_generate(num_pearl_steps=100)
+        output_text, num_tokens, num_acc_tokens, elapsed_time = engine.bench_generate(num_pearl_steps=num_pearl_steps)
         
         # Accumulate results
         all_outputs.extend(output_text)
@@ -249,7 +251,7 @@ def main():
         
         # Run benchmark test
         outputs, metrics, elapsed_time = run_benchmark(
-            engine, prompts, sampling_params, dataset_name, args.bs, args.run_ar_benchmark
+            engine, prompts, sampling_params, dataset_name, args.bs, args.run_ar_benchmark, args.num_pearl_steps
         )
         
         # Store results
