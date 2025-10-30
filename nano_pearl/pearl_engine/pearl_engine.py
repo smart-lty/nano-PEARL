@@ -61,7 +61,7 @@ class PEARLEngine:
         ctx = mp.get_context("spawn")
         # the control event is used to wait for the sub-processes to be ready
         self.control_event = ctx.Event()
-        self.controller = Controller(config, self.control_event) # Controller already includes Solution 2
+        self.controller = Controller(config, self.control_event)
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.draft_config.model, use_fast=True)
         config.eos = self.config.draft_config.eos
         logger.info(f"[Main Process] EOS token id: {config.eos}, EOS tokens: {self.tokenizer.decode(config.eos)}")   
