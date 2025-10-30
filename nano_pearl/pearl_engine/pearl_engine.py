@@ -99,10 +99,7 @@ class PEARLEngine:
         self.controller.write_draft_shm("exit")
         self.controller.write_target_shm("exit")
         for p in self.ps:
-            p.join()     
-            if p.is_alive():
-                p.kill()
-                p.join()                
+            p.join()                   
         self.controller.draft_shm.close()
         self.controller.target_shm.close()
         self.controller.draft_shm.unlink()
