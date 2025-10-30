@@ -9,13 +9,13 @@
 [![ArXiv](https://img.shields.io/badge/arXiv-2408.11850-b31b1b)](https://arxiv.org/abs/2408.11850)
 [![Conference](https://img.shields.io/badge/ICLR-2025-4B7BEC)](#)
 
-<em>A <strong>high-throughput</strong> parallel speculative decoding engine in nano-vllm style.<br></em>
+<em>A lightweight parallel speculative decoding implementation in nano-vllm style.<br></em>
 
 </div>
 
 # 🚀 nano-PEARL
 
-> **A high-throughput parallel speculative decoding engine in nano-vllm style**
+> **A lightweight parallel speculative decoding implementation in nano-vllm style**
 
 nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine. It decouples Draft and Target models onto separate device groups and runs them concurrently with on-the-fly verification, prefix KV caching, CUDA Graphs, page attention, flash attention and tensor parallelism — aiming for high throughput without sacrificing output quality.
 
@@ -49,7 +49,7 @@ pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
 ```
 ⚠️ When you directly use pip for installation, you may encounter that build flash-attn needs torch installed. In this case, you should **install torch first**, and then re-run the installation command.
 
-⚠️ If the installation of flash-attn is very slow, we strongly recommand you to download a whl file and **build flash attn from wheel**.
+⚠️ If the installation of flash-attn is very slow, we strongly recommend that you download a whl file and **build flash attn from wheel**.
 
 
 ## ✨ Key Features
@@ -62,7 +62,6 @@ pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
 - 🤖 **Auto-Set Hyper-parameters**: Automatically configure optimal parameters for your hardware setup.
 - 🚀 **High Performance**: Built on CUDA Graphs and tensor parallelism for maximum throughput.
 - 💾 **Memory Efficient**: Prefix KV caching reduces memory usage while maintaining performance.
-- 
 ## 🚀 Quick Start
 
 The `nano-PEARL` API mirrors `vLLM` / `nano-vllm`'s interface. The main difference is in the `LLM` engine initialization, where you must **specify both a target model and a draft model**, along with their respective tensor-parallel (TP) sizes.
@@ -91,74 +90,61 @@ See `bench.py` for benchmark.
 
 ## ⚙️ Implementation Details
 
-The core configuration of `nano-PEARL` is split into two main classes.
 
----
+## ⚙️ Implementation Details
 
-### 1. `PEARLConfig` (Engine Configuration)
+This section details the core configuration parameters.
 
-**File Location:** `nano_pearl/pearl_config.py`
-
-This is the most important configuration object, passed when initializing the `PEARLEngine`.
-
-#### 📦 Model & Parallelism Parameters
+#### 📦 Model & Parallelism Parameters (example.py, bench.py, pearl_engine.py)
 
 * `draft_model_path: str`
-    * **Description**: The path to the draft model (small model). Can be a local path or a Hugging Face hub repository name.
+    * **Description**: Path to the draft model (small model). Supports local paths or Hugging Face hub identifiers.
 * `target_model_path: str`
-    * **Description**: The path to the target model (large model).
+    * **Description**: Path to the target model (large model). Supports local paths or Hugging Face hub identifiers.
 * `draft_tensor_parallel_size: int`
-    * **Description**: The tensor-parallel (TP) size allocated for the **draft model**. For example, `1` means the draft model will be loaded entirely onto a single GPU.
+    * **Description**: The tensor-parallel (TP) size allocated to the **draft model**. For example, `1` loads the draft model onto a single GPU.
 * `target_tensor_parallel_size: int`
-    * **Description**: The tensor-parallel (TP) size allocated for the **target model**.
-    * **Constraint**: The sum `draft_tensor_parallel_size + target_tensor_parallel_size` must be less than or equal to the total number of available GPUs (currently supports up to 8).
+    * **Description**: The tensor-parallel (TP) size allocated to the **target model**.
+    * **Constraint**: The sum `draft_tensor_parallel_size + target_tensor_parallel_size` must not exceed the total number of available GPUs (currently <= 8).
 
-#### 💾 Memory & Batching Parameters
+#### 💾 Memory & Batching Parameters (pearl_engine.py)
 
 * `gpu_memory_utilization: float`
-    * **Description**: A value between `0.0` and `1.0` representing the fraction of GPU memory to be used for the KV Cache. This is the **key parameter** for controlling memory usage.
-    * **Recommendation**: `0.9` (90%) is a safe and efficient starting point.
-* `max_num_batched_tokens: int`
-    * **Description**: The maximum total number of tokens (i.e., `batch_size * sequence_length`) that the engine can process in a single batch.
-    * **Recommendation**: `16384` for 80GB GPUs (H100/A100); `8192` for 40GB GPUs.
-* `max_num_seqs: int`
-    * **Description**: The maximum number of sequences (requests) the engine can process concurrently.
-    * **Recommendation**: `512` for 80GB GPUs; `128` or `256` for 40GB GPUs.
-* `max_model_len: int`
-    * **Description**: The maximum context length supported by the model (including prompt and generated tokens).
-* `kvcache_block_size: int`
-    * **Description**: The block size for the KVCache in paged-attention.
-    * **Recommendation**: The default of `256` is suitable for most cases.
-* `num_kvcache_blocks: int`
-    * **Description**: The total number of KVCache blocks.
-    * **Recommendation**: If set to `-1` (default), the engine will automatically calculate the maximum number of blocks based on `gpu_memory_utilization`.
+    * **Description**: A value between `0.0` and `1.0` representing the fraction of GPU memory allocated for the KV Cache. This is the **key parameter** for memory management.
+    * **Recommendation**: `0.9` (90%) is a safe and efficient starting point.
 
-#### 🧠 Algorithm & Engine Parameters
+> **Note:** The following parameters must be tuned based on available GPU memory and specific deployment scenarios.
+
+* `max_num_batched_tokens: int`
+    * **Description**: The maximum total number of tokens (i.e., `batch_size * sequence_length`) processed by the engine in a single batch.
+    * **Recommendation**: `16384` for 80GB GPUs (H100/A100); `8192` for 40GB GPUs.
+* `max_num_seqs: int`
+    * **Description**: The maximum number of sequences (requests) processed by the engine concurrently.
+    * **Recommendation**: `512` for 80GB GPUs; `128` or `256` for 40GB GPUs.
+* `max_model_len: int`
+    * **Description**: The maximum context length supported by the model (including prompt and generated tokens).
+* `set_gamma_batch_size: list[int]`
+    * **Description**: Specifies the batch sizes for which `gamma` is auto-tuned (when `gamma = -1`).
+    * **Recommendation**: Default: `[1, 2, 4, 8, 16, 32, 64]`. This list can be reduced (e.g., `[1, 8, 32]`) in resource-constrained scenarios to reduce profiling time.
+
+#### 🧠 Algorithm & Engine Parameters (example.py, bench.py)
 
 * `gamma: int`
-    * **Description**: This is the **window size for adaptive draft length** in the PEARL algorithm, i.e., how many tokens the draft model "looks ahead" at one time.
-    * **Recommendation**: Set to `-1` (default) to enable **auto-setting**. The engine will automatically select a near-optimal value based on the model configuration.
+    * **Description**: The **window size for adaptive draft length** in the PEARL algorithm; i.e., the number of tokens the draft model speculates.
+    * **Recommendation**: Set to `-1` (default) to enable **auto-setting**. The engine will automatically select a near-optimal value.
 * `enforce_eager: bool`
-    * **Description**: Whether to force Eager mode, disabling CUDA Graphs.
-    * **Recommendation**: Keep as `False` (default) for maximum performance. Only set to `True` for debugging purposes.
-
----
-
-### 2. `SamplingParams` (Request Configuration)
-
-**File Location:** Imported from the top-level `nano_pearl` package.
-
-These parameters are passed during `engine.add_request()` to control the generation behavior for a **single request**.
-
+    * **Description**: If `True`, forces Eager mode and disables CUDA Graphs.
+    * **Recommendation**: Keep as `False` (default) for maximum performance. Set to `True` only for debugging purposes.
 * `temperature: float`
-    * **Description**: The sampling temperature. `0.0` indicates greedy sampling, which is used in `example.py` and benchmarks for deterministic outputs.
-    * **Recommendation**: Use `0.0` for deterministic output or benchmarks. Use `> 0.0` (e.g., `0.7`) for creative tasks.
+  t * **Description**: The sampling temperature. `0.0` indicates greedy sampling, used in `example.py` and benchmarks for deterministic outputs.
+    * **Recommendation**: Use `0.0` for deterministic output or benchmarks; use `> 0.0` (e.g., `0.7`) for creative tasks.
 * `max_tokens: int`
-    * **Description**: The maximum number of new tokens to generate for this request.
-    * **Recommendation**: Set to a reasonable limit (e.g., `256`, `512`, `1024`) to prevent runaway generations.
+    * **Description**: The maximum number of new tokens to generate for a given request.
+    * **Recommendation**: Set a reasonable limit (e.g., `256`, `512`, `1024`) to prevent runaway generations.
 * `ignore_eos: bool`
-    * **Description**: If `True`, the generation process will ignore the EOS (End-of-Sentence) token and continue until `max_tokens` is reached.
-    * **Recommendation**: Keep as `False` (default) unless you specifically need to generate a fixed number of tokens.
+    * **Description**: If `True`, the generation process ignores the EOS (End-of-Sentence) token and continues until `max_tokens` is reached.
+    * **Recommendation**: Keep as `False` (default) unless generating a fixed-length output is required.
+
 
 
 ## 📋 TODOs
