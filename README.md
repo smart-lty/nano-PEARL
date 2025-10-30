@@ -90,9 +90,6 @@ See `bench.py` for benchmark.
 
 ## ⚙️ Implementation Details
 
-
-## ⚙️ Implementation Details
-
 This section details the core configuration parameters.
 
 #### 📦 Model & Parallelism Parameters (example.py, bench.py, pearl_engine.py)
