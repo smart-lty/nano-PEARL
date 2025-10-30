@@ -1,4 +1,5 @@
 import atexit
+import signal  # 1. Import signal
 from dataclasses import fields
 from tqdm.auto import tqdm
 from transformers import AutoTokenizer
@@ -21,8 +22,25 @@ class Controller:
         self.draft_event = []
         self.target_event = []
         self.control_event = control_event
-        self.draft_shm = SharedMemory(name=config.draft_config.group_name, create=True, size=2**20)
-        self.target_shm = SharedMemory(name=config.target_config.group_name, create=True, size=2**20)
+
+        draft_name = config.draft_config.group_name
+        target_name = config.target_config.group_name
+
+        # Robust Startup: Automatically clean up stale shared memory
+        for name in [draft_name, target_name]:
+            try:
+                # Try to attach to existing memory
+                existing_shm = SharedMemory(name=name, create=False)
+                # If successful, it means there's a remnant, so close and unlink it immediately
+                existing_shm.close()
+                existing_shm.unlink()
+                logger.info(f"[Main Process] Cleaned up stale shared memory: {name}", color="yellow")
+            except FileNotFoundError:
+                pass
+
+        # Now it's safe to create new shared memory
+        self.draft_shm = SharedMemory(name=draft_name, create=True, size=2**20)
+        self.target_shm = SharedMemory(name=target_name, create=True, size=2**20)
 
     def add_event(self, rank, event):
         if rank in self.config.draft_config.devices:
@@ -57,11 +75,12 @@ class PEARLEngine:
     def __init__(self, config: PEARLConfig):
         self.config = config
         self.ps = []
+        self._exiting = False  # 3. Add a flag
         
         ctx = mp.get_context("spawn")
         # the control event is used to wait for the sub-processes to be ready
         self.control_event = ctx.Event()
-        self.controller = Controller(config, self.control_event)
+        self.controller = Controller(config, self.control_event) # Controller already includes Solution 2
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.draft_config.model, use_fast=True)
         config.eos = self.config.draft_config.eos
         logger.info(f"[Main Process] EOS token id: {config.eos}, EOS tokens: {self.tokenizer.decode(config.eos)}")   
@@ -69,16 +88,31 @@ class PEARLEngine:
         for i in range(config.world_size):
             event = ctx.Event()
             process = ctx.Process(target=DraftModelRunner if i in config.draft_config.devices else TargetModelRunner, args=(config, i, event, self.control_event))
+            
+            # --- Core Fix: Disable default atexit join ---
+            process.daemon = True 
+            # --- Fix ends ---
+            
             process.start()
             self.ps.append(process)
             self.controller.add_event(i, event)
         
         # wait for the initialization of the draft and target TP models
         logger.info("[Main Process] Waiting for the initialization of the draft and target TP models...", color="red")
-        self.control_event.wait()
+        self.control_event.wait() # Will get stuck here on OOM, interrupted by Ctrl+C
         self.control_event.clear()
         
-        atexit.register(self.exit)
+        atexit.register(self.exit) # Register our own exit with timeout
+
+        # Add signal handling
+        def signal_handler(sig, frame):
+            sig_name = signal.Signals(sig).name
+            logger.warning(f"[Main Process] Received signal {sig_name} ({sig}). Initiating graceful shutdown...", color="red")
+            self.exit()
+            
+        signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
+        signal.signal(signal.SIGTERM, signal_handler) # Handle kill command
+        # --- Signal handling ends ---
 
     def log(self, content: str):
         logger.info(f"[Main Process] Running log function, waiting for the sub-processes", color="red")
@@ -94,14 +128,57 @@ class PEARLEngine:
         self.control_event.clear()
 
     def exit(self):
-        self.controller.write_draft_shm("exit")
-        self.controller.write_target_shm("exit")
+        # exit method
+        # This method can be triggered by atexit or signal even if the process is stuck
+        if self._exiting:
+            return
+        self._exiting = True
+        
+        logger.info("[Main Process] Shutting down... Sending 'exit' signal to subprocesses.", color="red")
+        
+        try:
+            self.controller.write_draft_shm("exit")
+            self.controller.write_target_shm("exit")
+        except Exception as e:
+            logger.error(f"[Main Process] Error writing to shared memory during exit: {e}. Processes may be stuck.", color="red")
+
+        # Set a timeout (e.g., 5 seconds)
+        join_timeout_seconds = 5
+        
         for p in self.ps:
-            p.join()
+            logger.info(f"[Main Process] Waiting for subprocess {p.pid} to join (timeout: {join_timeout_seconds}s)...", color="blue")
+            p.join(join_timeout_seconds) # Wait, but with a timeout
+            
+            # If the subprocess is still alive after the timeout, force terminate it
+            if p.is_alive():
+                logger.warning(f"[Main Process] Subprocess {p.pid} did not exit gracefully. Forcing termination (SIGTERM)...", color="yellow")
+                p.terminate() # Send SIGTERM
+                p.join(1) # Wait for 1 second
+                
+                if p.is_alive():
+                    logger.error(f"[Main Process] Subprocess {p.pid} still alive after SIGTERM. Sending SIGKILL...", color="red")
+                    p.kill() # Send SIGKILL
+                    p.join() # Force wait for it to be killed
+        
+        logger.info("[Main Process] All subprocesses terminated. Closing and unlinking shared memory.", color="red")
+        
+        # execute cleanup
         self.controller.draft_shm.close()
         self.controller.target_shm.close()
-        self.controller.draft_shm.unlink()
-        self.controller.target_shm.unlink()
+        
+        try:
+            self.controller.draft_shm.unlink()
+            logger.info("[Main Process] Draft shared memory unlinked.", color="green")
+        except FileNotFoundError:
+            logger.warning("[Main Process] Draft shared memory was already unlinked.", color="yellow")
+        
+        try:
+            self.controller.target_shm.unlink()
+            logger.info("[Main Process] Target shared memory unlinked.", color="green")
+        except FileNotFoundError:
+            logger.warning("[Main Process] Target shared memory was already unlinked.", color="yellow")
+            
+        logger.info("[Main Process] Shutdown complete.", color="red")
 
     def add_request(self, prompt: str | list[int], sampling_params: SamplingParams):
         if isinstance(prompt, str):
