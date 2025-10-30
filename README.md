@@ -99,8 +99,8 @@ See `bench.py` for benchmark.
 ## 🐛 Bug Fixing
 Coming Soon!
 
+## 📄 File structure
 ```
-## 🚀 File structure
 .
 ├── LICENSE
 ├── README.md
