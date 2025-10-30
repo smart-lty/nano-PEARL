@@ -36,9 +36,7 @@ class Controller:
                 existing_shm.unlink()
                 logger.info(f"[Main Process] Cleaned up stale shared memory: {name}", color="yellow")
             except FileNotFoundError:
-                # This is the best case, meaning no remnants
                 pass
-        # --- Cleanup logic ends ---
 
         # Now it's safe to create new shared memory
         self.draft_shm = SharedMemory(name=draft_name, create=True, size=2**20)
@@ -138,7 +136,6 @@ class PEARLEngine:
         
         logger.info("[Main Process] Shutting down... Sending 'exit' signal to subprocesses.", color="red")
         
-        # Try to gracefully notify subprocesses to exit
         try:
             self.controller.write_draft_shm("exit")
             self.controller.write_target_shm("exit")
@@ -152,7 +149,7 @@ class PEARLEngine:
             logger.info(f"[Main Process] Waiting for subprocess {p.pid} to join (timeout: {join_timeout_seconds}s)...", color="blue")
             p.join(join_timeout_seconds) # Wait, but with a timeout
             
-            # If the subprocess is still alive after the timeout (e.g., stuck on a barrier), force terminate it
+            # If the subprocess is still alive after the timeout, force terminate it
             if p.is_alive():
                 logger.warning(f"[Main Process] Subprocess {p.pid} did not exit gracefully. Forcing termination (SIGTERM)...", color="yellow")
                 p.terminate() # Send SIGTERM
