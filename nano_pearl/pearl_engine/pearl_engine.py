@@ -61,7 +61,7 @@ class PEARLEngine:
         ctx = mp.get_context("spawn")
         # the control event is used to wait for the sub-processes to be ready
         self.control_event = ctx.Event()
-        self.controller = Controller(config, self.control_event)
+        self.controller = Controller(config, self.control_event) # Controller already includes Solution 2
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.draft_config.model, use_fast=True)
         config.eos = self.config.draft_config.eos
         logger.info(f"[Main Process] EOS token id: {config.eos}, EOS tokens: {self.tokenizer.decode(config.eos)}")   
@@ -69,6 +69,7 @@ class PEARLEngine:
         for i in range(config.world_size):
             event = ctx.Event()
             process = ctx.Process(target=DraftModelRunner if i in config.draft_config.devices else TargetModelRunner, args=(config, i, event, self.control_event))
+            process.daemon = True        
             process.start()
             self.ps.append(process)
             self.controller.add_event(i, event)
@@ -79,6 +80,7 @@ class PEARLEngine:
         self.control_event.clear()
         
         atexit.register(self.exit)
+    
 
     def log(self, content: str):
         logger.info(f"[Main Process] Running log function, waiting for the sub-processes", color="red")
@@ -97,11 +99,15 @@ class PEARLEngine:
         self.controller.write_draft_shm("exit")
         self.controller.write_target_shm("exit")
         for p in self.ps:
-            p.join()
+            p.join()     
+            if p.is_alive():
+                p.kill()
+                p.join()                
         self.controller.draft_shm.close()
         self.controller.target_shm.close()
         self.controller.draft_shm.unlink()
         self.controller.target_shm.unlink()
+        
 
     def add_request(self, prompt: str | list[int], sampling_params: SamplingParams):
         if isinstance(prompt, str):

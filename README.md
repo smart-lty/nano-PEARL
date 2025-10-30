@@ -49,7 +49,7 @@ pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
 ```
 ⚠️ When you directly use pip for installation, you may encounter that build flash-attn needs torch installed. In this case, you should **install torch first**, and then re-run the installation command.
 
-⚠️ If the installation of flash-attn is very slow, we strongly recommand you to download a whl file and **build flash attn from wheel**.
+⚠️ If the installation of flash-attn is very slow, we strongly recommend you to download a whl file and **build flash attn from wheel**.
 
 
 ## ✨ Key Features
@@ -63,15 +63,39 @@ pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
 - 🚀 **High Performance**: Built on CUDA Graphs and tensor parallelism for maximum throughput.
 - 💾 **Memory Efficient**: Prefix KV caching reduces memory usage while maintaining performance.
 
+## 🚀 Quick Start
+
+The `nano-PEARL` API mirrors `vLLM` / `nano-vllm`'s interface. The main difference is in the `LLM` engine initialization, where you must **specify both a target model and a draft model**, along with their respective tensor-parallel (TP) sizes.
+
+See `example.py` for usage: a minimal example of running parallel speculative decoding on 2 GPUs (e.g., 1 for the target model, 1 for the draft model):
+
+```python
+from nano_pearl import PEARLConfig, PEARLEngine, SamplingParams, logger
+
+def main():
+    draft_model_path = "/path/to/draft/model"
+    target_model_path = "/path/to/target/model"
+    
+    config = PEARLConfig(draft_model_path, target_model_path, draft_tensor_parallel_size=1, target_tensor_parallel_size=1, gpu_memory_utilization=0.9)
+    engine = PEARLEngine(config)
+    
+    prompt = "Explain quantum computing in simple terms"
+    sampling_params = SamplingParams(temperature=0.0, max_tokens=256, ignore_eos=False)
+    engine.add_request(prompt, sampling_params)
+    
+    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate()
+```
+
 ## 📊 BenchMark Results
 
-Coming Soon!
+Coming Soon! See `bench.py` for benchmark.
 
 ## 📋 TODOs
 
 - [ ]  **Dynamic TP Size**: Support dynamic TP size, including TP=6/7, hence the 8 GPUs can be fully used!
 - [ ]  **Draft Model Temperature**: Support setting a non-zero temperature for the draft model.
 - [ ]  **Continuous Batching**: Support continuous batching and chunked prefill.
+- [ ]  **Aligned Models**: Support Pearl's exclusive fine-tuning draft models.
 
 ## 🐛 Bug Fixing
 Coming Soon!
