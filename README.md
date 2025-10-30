@@ -83,7 +83,7 @@ def main():
     sampling_params = SamplingParams(temperature=0.0, max_tokens=256, ignore_eos=False)
     engine.add_request(prompt, sampling_params)
     
-    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate() 
+    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate() ```
 
 ## 📊 BenchMark Results
 
