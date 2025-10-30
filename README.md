@@ -91,8 +91,6 @@ See `bench.py` for benchmark.
 
 ## ⚙️ Implementation Details
 
-## ⚙️ Implementation Details
-
 The core configuration of `nano-PEARL` is split into two main classes.
 
 ---
