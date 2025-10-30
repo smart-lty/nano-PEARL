@@ -67,7 +67,7 @@ pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
 
 The `nano-PEARL` API mirrors `vLLM` / `nano-vllm`'s interface. The main difference is in the `LLM` engine initialization, where you must **specify both a target model and a draft model**, along with their respective tensor-parallel (TP) sizes.
 
-`Example.py`: a minimal example of running parallel speculative decoding on 2 GPUs (e.g., 1 for the target model, 1 for the draft model):
+See `example.py` for usage: a minimal example of running parallel speculative decoding on 2 GPUs (e.g., 1 for the target model, 1 for the draft model):
 
 ```python
 from nano_pearl import PEARLConfig, PEARLEngine, SamplingParams, logger
@@ -87,7 +87,7 @@ def main():
 ```
 ## 📊 BenchMark Results
 
-Coming Soon!
+See `bench.py` for benchmark.
 
 ## 📋 TODOs
 
