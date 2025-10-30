@@ -95,7 +95,7 @@ Coming Soon! See `bench.py` for benchmark.
 - [ ]  **Dynamic TP Size**: Support dynamic TP size, including TP=6/7, hence the 8 GPUs can be fully used!
 - [ ]  **Draft Model Temperature**: Support setting a non-zero temperature for the draft model.
 - [ ]  **Continuous Batching**: Support continuous batching and chunked prefill.
-- [ ]  **Aligned Models**: Support Pearl's exclusive fine-tuning draft models.
+- [ ]  **PEARL-2**: Support fine-tuning / distilling a PEARL-specific draft model for further acceleration.
 
 ## 🐛 Bug Fixing
 Coming Soon!
