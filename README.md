@@ -102,7 +102,7 @@ This section details the core configuration parameters.
     * **Description**: The tensor-parallel (TP) size allocated to the **draft model**. For example, `1` loads the draft model onto a single GPU.
 * `target_tensor_parallel_size: int`
     * **Description**: The tensor-parallel (TP) size allocated to the **target model**.
-    * **Constraint**: The sum `draft_tensor_parallel_size + target_tensor_parallel_size` must not exceed the total number of available GPUs (currently <= 8).
+    * **Constraint**: The sum `draft_tensor_parallel_size + target_tensor_parallel_size` must not exceed the total number of available GPUs (currently only supports 1,2,4,8).
 
 #### 💾 Memory & Batching Parameters (pearl_engine.py)
 
@@ -122,7 +122,7 @@ This section details the core configuration parameters.
     * **Description**: The maximum context length supported by the model (including prompt and generated tokens).
 * `set_gamma_batch_size: list[int]`
     * **Description**: Specifies the batch sizes for which `gamma` is auto-tuned (when `gamma = -1`).
-    * **Recommendation**: Default: `[1, 2, 4, 8, 16, 32, 64]`. This list can be reduced (e.g., `[1, 8, 32]`) in resource-constrained scenarios to reduce profiling time.
+    * **Recommendation**: Default: `[1, 2, 4, 8, 16, 32, 64]`. This list can be reduced (e.g., `[1, 2, 4,8]`) in resource-constrained scenarios to reduce profiling time.
 
 #### 🧠 Algorithm & Engine Parameters (example.py, bench.py)
 
