@@ -186,9 +186,6 @@ def main():
         draft_tensor_parallel_size=args.draft_tp, 
         target_tensor_parallel_size=args.target_tp, 
         gpu_memory_utilization=args.gpu_memory_utilization,
-        max_model_len=16384,
-        max_num_seqs=128,
-        max_num_batched_tokens=16384*2,
     )
     engine = PEARLEngine(config)
     
