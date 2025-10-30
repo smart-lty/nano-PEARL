@@ -99,6 +99,47 @@ See `bench.py` for benchmark.
 ## 🐛 Bug Fixing
 Coming Soon!
 
+```
+## 🚀 File structure
+.
+├── LICENSE
+├── README.md
+├── bench.py                     # Benchmark testing script
+├── example.py                   # Usage examples
+├── nano_pearl                   # Core library directory
+│   ├── __init__.py              # Package initialization file
+│   ├── layers                   # Neural network layer implementations
+│   │   ├── activation.py        # Activation functions
+│   │   ├── attention.py         # Attention mechanisms
+│   │   ├── embed_head.py        # Embedding and head layers
+│   │   ├── layernorm.py         # LayerNorm implementation
+│   │   ├── linear.py            # Linear layers
+│   │   ├── rotary_embedding.py  # Rotary position encoding
+│   │   └── sampler.py           # Samplers
+│   ├── models                   # Model implementations
+│   │   ├── __init__.py          # Models package initialization
+│   │   ├── llama.py             # LLaMA model implementation
+│   │   ├── qwen2.py             # Qwen2 model implementation
+│   │   └── qwen3.py             # Qwen3 model implementation
+│   ├── pearl_config.py          # PEARL configuration management
+│   ├── pearl_engine             # PEARL engine core
+│   │   ├── block_manager.py     # Block manager
+│   │   ├── pearl_engine.py      # Main engine implementation
+│   │   ├── pearl_model_runner.py # Model runner
+│   │   ├── scheduler.py         # Scheduler
+│   │   └── sequence.py          # Sequence management
+│   └── utils                    # Utility functions
+│       ├── __init__.py          # Utilities package initialization
+│       ├── context.py           # Context management
+│       ├── loader.py            # Model loader
+│       └── pearl_logger.py      # Logger
+├── pyproject.toml               # Python project configuration
+├── static                       # Static resources
+│   ├── default_prompts.txt      # Default prompts
+│   └── nano_pearl.gif           # Project logo animation
+└── uv.lock                      # uv dependency lock file
+```
+
 ## 🙏 Acknowledgements
 
 
@@ -123,5 +164,12 @@ url={https://openreview.net/forum?id=QOXrVMiHGK}
       archivePrefix={arXiv},
       primaryClass={cs.CL},
       url={https://arxiv.org/abs/2408.11850}, 
+}
+@misc{nanopearl,
+  author = {Tianyu Liu},
+  title = {nanochat: The best ChatGPT that $100 can buy},
+  year = {2025},
+  publisher = {GitHub},
+  url = {https://github.com/smart-lty/nano-PEARL}
 }
 ```
