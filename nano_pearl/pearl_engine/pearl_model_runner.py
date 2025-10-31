@@ -346,22 +346,26 @@ class ModelRunnerBase:
         torch.cuda.empty_cache()
         torch.cuda.reset_peak_memory_stats()
 
+        # TODO: will support to customize these parameters in the future.
+        PROFILE_STEPS = 30
+        SKIP_FIRST_STEPS = 5
         bs = [1, 2, 4, 8, 16, 32]
+        MAX_SEQ_LEN = 256 # should be set to lower value if the memory is not enough.
         speed = torch.zeros(len(bs), dtype=torch.float32, device="cuda")
         for idx in trange(len(bs), desc="Auto Set Gamma", disable=self.rank != 0):
-            seqs = [Sequence([0] * (self.global_config.max_model_len // (bs[idx] + 1))) for _ in range(bs[idx])]
+            seqs = [Sequence([0] * MAX_SEQ_LEN) for _ in range(bs[idx])]
             bs_speed = []
             for seq in seqs:
                 self.add_request(seq)
             dist.barrier()
-            for _ in range(30):
+            for _ in range(PROFILE_STEPS):
                 torch.cuda.synchronize()
                 start_time = time.time()
                 outputs, num_tokens = self.step()
                 torch.cuda.synchronize()
                 end_time = time.time()
                 bs_speed.append(1 / (end_time - start_time))
-            bs_speed = bs_speed[5:]
+            bs_speed = bs_speed[SKIP_FIRST_STEPS:]
             speed[idx] = sum(bs_speed) / len(bs_speed)
             self.clear_requests()
         

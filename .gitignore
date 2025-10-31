@@ -3,3 +3,4 @@ nano_pearl/__pycache__/
 nano_pearl/*/__pycache__/
 
 nano_PEARL.egg-info/
+.tmp/

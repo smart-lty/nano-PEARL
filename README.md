@@ -15,7 +15,7 @@
 
 # 🚀 nano-PEARL
 
-nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine. It decouples Draft and Target models onto separate device groups and runs them concurrently with on-the-fly verification, prefix KV caching, CUDA Graphs, and tensor parallelism — aiming for high throughput without sacrificing output quality.
+nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine. It decouples Draft and Target models onto separate device groups and runs them concurrently with on-the-fly verification, prefix KV caching, CUDA Graphs, paged attention, flash attention and tensor parallelism — aiming for high throughput without sacrificing output quality.
 
 ## 🎉 Latest News
 
