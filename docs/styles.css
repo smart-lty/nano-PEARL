@@ -1,0 +1,421 @@
+:root{
+  /* Light, neutral, Claude-like palette */
+  --bg: #FAF9F5;       /* page background */
+  --panel: #FFFFFF;    /* header / panels */
+  --card: #FFFFFF;     /* cards */
+  --line: #E8E6DC;     /* subtle borders */
+  --muted: #6B6A64;    /* secondary text */
+  --text: #141413;     /* primary text */
+  --accent: #D97757;   /* primary accent (orange) */
+  --accent-2: #6A9BCC; /* secondary (blue) */
+  --ring: rgba(217,119,87,0.25);
+  --ar-label-bg: #def5e8;
+  --ar-label-border: #8fcea7;
+  --ar-label-text: #2f6a44;
+  --pearl-label-bg: #e1ecff;
+  --pearl-label-border: #9fbaf6;
+  --pearl-label-text: #2c4f8b;
+}
+
+*{box-sizing:border-box}
+html,body{
+  margin:0; padding:0; background:var(--bg); color:var(--text);
+  font-family: 'Lora', ui-serif, Georgia, serif;
+}
+
+a{color:inherit; text-decoration:none}
+.container{max-width:1080px;margin:0 auto;padding:24px}
+
+/* Top nav */
+.nav{
+  position: sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:center;
+  padding:14px 18px; background:rgba(250,249,245,0.8); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner{display:flex; align-items:center; gap:20px; width:100%; max-width:1080px}
+
+/* Logo */
+.logo{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.2px}
+.logo .sig{
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-weight:700; font-size: 20px; color:var(--text);
+}
+.logo svg{width:22px;height:22px;flex:0 0 22px;}
+/* Override any inline strokes from the SVG to keep things simple and on-brand */
+.logo svg path{stroke: var(--accent) !important;}
+
+/* Nav links */
+.nav-links{
+  margin:0 auto; display:flex; gap:8px;
+  background: #fff; padding:6px; border-radius:14px;
+  border:1px solid var(--line);
+}
+.nav-links a{
+  padding:8px 12px; border-radius:10px;
+  color:var(--muted); font-weight:600; font-size: 16px;
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  border: 1px solid transparent;
+}
+.nav-links a.active, .nav-links a:hover{
+  color:var(--text); background:#fff;
+  border-color: var(--line);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+/* Hero */
+.page-hero{
+  background:
+    radial-gradient(900px 280px at 50% -120px, rgba(217,119,87,0.06), transparent 60%),
+    radial-gradient(700px 250px at 90% -140px, rgba(106,155,204,0.06), transparent 60%);
+  border-bottom:1px solid var(--line);
+}
+.kicker{color:var(--muted); text-transform: uppercase; letter-spacing:0.16em; font-size:12px; font-weight:700}
+h1{margin:10px 0 6px; font-size: 40px; font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;}
+.sub{color:var(--muted); max-width:780px}
+
+/* Card */
+.card{
+  background: var(--card);
+  border:1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(20,20,19,0.06);
+  border-radius: 16px;
+}
+
+/* Footer */
+.footer{
+  margin-top:80px;
+  padding:28px 0;
+  color:var(--muted);
+  border-top:1px solid var(--line);
+}
+.footer .container{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+
+/* Coming soon notice */
+.notice{padding:24px; text-align:center; font-weight:600; color:#7a786f; background:#fff}
+
+/* Controls */
+.controls{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+.select{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:12px 16px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  min-width:240px;
+  cursor:pointer;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+.select:hover{
+  border-color:rgba(107,106,100,0.35);
+  box-shadow:0 0 0 3px rgba(217,119,87,0.12);
+}
+.select label{
+  font-size:12px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+  font-weight:700;
+  cursor:pointer;
+}
+.select select{
+  flex:1;
+  appearance:none;
+  background:#f6f3eb;
+  border:1px solid var(--line);
+  border-radius:10px;
+  color:var(--text);
+  font-weight:600;
+  font-size:14px;
+  padding:8px 34px 8px 12px;
+  min-height:38px;
+  min-width:160px;
+  cursor:pointer;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+.select select:focus{
+  outline:none;
+  border-color:rgba(217,119,87,0.6);
+  box-shadow:0 0 0 3px var(--ring);
+  background:#fff;
+}
+.btn-visualize{
+  padding:10px 20px;
+  border-radius:12px;
+  border:1px solid rgba(217,119,87,0.5);
+  background:rgba(217,119,87,0.14);
+  color:var(--accent);
+  font-family:'Poppins', ui-sans-serif, system-ui;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.btn-visualize:hover{
+  background:rgba(217,119,87,0.22);
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(217,119,87,0.14);
+}
+.btn-visualize.is-active{
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+  box-shadow:0 8px 18px rgba(217,119,87,0.25);
+}
+.btn-visualize:focus-visible{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--ring);
+}
+.tip-text{
+  font-size:12px;
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  color:var(--accent-2);
+  font-weight:600;
+  margin-left:12px;
+  padding:0 12px;
+  border-radius:16px;
+  background:rgba(106,155,204,0.14);
+  border:1px solid rgba(106,155,204,0.3);
+  line-height:24px;
+}
+
+/* Table */
+.table-wrap{overflow:auto; border-radius:14px; border:1px solid var(--line); background:#fff}
+table{width:100%; border-collapse:separate; border-spacing:0; min-width:760px}
+th, td{padding:12px 14px; text-align:left; border-bottom:1px solid var(--line); color:var(--text)}
+thead th{position:sticky; top:0; background:#fff; z-index:1}
+tbody tr:hover{background:#faf8f2}
+thead th:first-child, tbody td:first-child, tbody th:first-child{position:sticky; left:0; background:#fff; z-index:2}
+.col-pair{color:#4a4945; font-weight:700; max-width:300px; font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;}
+
+.badge{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); font-size:11px; margin-left:6px}
+
+/* Help text */
+.help{color:var(--muted); font-size:12px; margin-top:8px}
+
+/* Chart container */
+.chart-card{padding:18px; background:#fff}
+.settings-card{
+  padding:28px 30px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  background:
+    linear-gradient(135deg, rgba(217,119,87,0.08), rgba(106,155,204,0.08));
+  border:1px solid rgba(20,20,19,0.06);
+  box-shadow:0 10px 28px rgba(20,20,19,0.08);
+}
+.settings-header{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.settings-title{
+  margin:0;
+  font-size:20px;
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-weight:700;
+  color:var(--text);
+}
+.settings-sub{
+  margin:0;
+  font-size:13px;
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  color:var(--muted);
+}
+.settings-grid{
+  margin:0;
+  padding:0;
+  list-style:none;
+  display:grid;
+  gap:14px 18px;
+  grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+}
+.setting{
+  background:#fff;
+  border:1px solid rgba(20,20,19,0.06);
+  border-radius:14px;
+  padding:14px 16px;
+  box-shadow:0 6px 20px rgba(20,20,19,0.06);
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.setting dt{
+  margin:0;
+  font-size:11px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  color:var(--muted);
+  font-weight:700;
+}
+.setting dd{
+  margin:0;
+  font-size:15px;
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-weight:600;
+  color:var(--text);
+}
+.settings-footnote{
+  margin:4px 0 0;
+  font-size:12px;
+  color:var(--accent-2);
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+/* Enhanced pair layout for long names */
+.pair-main{font-family:'Poppins', ui-sans-serif, system-ui; font-weight:700; line-height:1.15}
+.pair-sub{color:var(--muted); font-size:12px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:560px}
+.mode-chip{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 10px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  border:1px solid transparent;
+  margin-right:10px;
+  font-family:'Poppins', ui-sans-serif, system-ui;
+}
+.mode-chip.ar{
+  color:var(--ar-label-text);
+  background:var(--ar-label-bg);
+  border-color:var(--ar-label-border);
+}
+.mode-chip.pearl{
+  color:var(--pearl-label-text);
+  background:var(--pearl-label-bg);
+  border-color:var(--pearl-label-border);
+}
+.model-name{
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-weight:600;
+  color:var(--text);
+  display:inline-block;
+  line-height:1.2;
+}
+.arr{margin:0 6px; color:var(--muted)}
+
+/* Nav shadow on scroll */
+.nav.scrolled{box-shadow:0 6px 18px rgba(20,20,19,0.08)}
+
+/* Smooth hover states */
+.nav-links a{transition: box-shadow .25s ease, border-color .2s ease, background-color .2s ease, color .2s ease}
+.card, .select{transition: box-shadow .25s ease, border-color .2s ease}
+
+/* Reveal on scroll (reduced motion respected) */
+.reveal{opacity:0; transform: translateY(8px); transition: opacity .4s ease, transform .4s ease}
+.reveal.show{opacity:1; transform: none}
+@media (prefers-reduced-motion: reduce){
+  .nav-links a, .card, .select, .reveal{transition: none}
+}
+
+/* Hide left logo/signature entirely */
+.logo{display:none !important}
+
+/* Speedup highlight */
+td.speedup-cell{
+  background:#fff;
+  border: 2px solid var(--accent-2);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(106,155,204,0.18);
+  font-weight:700;
+}
+
+/* Table aesthetics (Claude-like) */
+.table-wrap{background:#fff; border-radius:14px; border:1px solid var(--line)}
+table thead th{
+  font-family:'Poppins', ui-sans-serif, system-ui;
+  font-size:13px; color:#4a4945;
+  border-bottom:2px solid var(--line);
+}
+table tbody td, table tbody th{
+  height:48px;
+}
+table tbody tr:hover{background:#fbfaf6}
+/* Slightly thicker column separators resembling the screenshot */
+table td + td, table th + th{ border-left: 1px solid var(--line) }
+
+/* Normalize table layout & column widths */
+.table-wrap table{ table-layout: fixed; }
+.col-draft{ width: 24% }
+.col-target{ width: 24% }
+.col-pearl{ width: 16% }
+.col-ar{ width: 16% }
+.col-mat{ width: 10% }
+.col-speedup{ width: 10% }
+
+/* Header badges */
+.th-badge{
+  display:inline-block; margin-right:8px; padding:2px 8px; border-radius:999px;
+  border:1px solid var(--line); color:var(--muted); font-size:11px; font-weight:700;
+  font-family:'Poppins', ui-sans-serif, system-ui;
+}
+
+/* Normalize table layout & column widths (5 columns) */
+.table-wrap table{ table-layout: fixed; }
+.col-target{ width: 28% }
+.col-draft{ width: 28% }
+.col-throughput{ width: 18% }
+.col-mat{ width: 10% }
+.col-speedup{ width: 16% }
+
+/* Emphasize both model columns */
+th.col-target, td.col-draft{
+  font-weight:700;
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+.speedup-col{
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  text-align:center;
+  letter-spacing:0.02em;
+}
+
+/* Group accent: left vertical bar per target (uses --grp color) */
+th.col-target.target-cell{
+  position: relative;
+  border-left: 4px solid var(--grp, var(--line));
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  padding-left: 12px;
+}
+
+/* Speedup whole-column framing stays */
+td.speedup-col{ font-weight:700; border-left: 2px solid var(--accent-2); border-right: 2px solid var(--accent-2); }
+tbody tr:first-child td.speedup-col{ border-top: 2px solid var(--accent-2); border-top-left-radius: 10px; border-top-right-radius: 10px; }
+tbody tr:last-child td.speedup-col{ border-bottom: 2px solid var(--accent-2); border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+
+.is-hidden{display:none !important;}
+.table-note{
+  margin:8px 6px 0;
+  font-size:12px;
+  color:var(--muted);
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  display:flex;
+  align-items:flex-start;
+  gap:6px;
+}
+.footnote-marker{
+  font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-weight:700;
+  font-size:10px;
+  letter-spacing:0.04em;
+  color:var(--accent-2);
+  vertical-align:super;
+  display:inline-block;
+  margin-left:4px;
+}
+.table-note .footnote-marker{
+  margin:2px 0 0;
+}

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>BenchMark • nano-PEARL</title>
+  <meta name="color-scheme" content="dark light">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css"/>
+</head>
+<body>
+  
+    <div class="nav">
+      <div class="nav-inner">
+        <a class="logo" href="./index.html" aria-label="nano-PEARL Home">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 12c5-9 11-9 16 0" stroke="url(#g1)" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M4 12c5 9 11 9 16 0" stroke="url(#g2)" stroke-width="2.2" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="g1" x1="4" x2="20" y1="12" y2="12">
+                <stop stop-color="#9AE6B4"/><stop offset="1" stop-color="#8AB4F8"/>
+              </linearGradient>
+              <linearGradient id="g2" x1="4" x2="20" y1="12" y2="12">
+                <stop stop-color="#8AB4F8"/><stop offset="1" stop-color="#9AE6B4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span class="sig">nano-PEARL</span>
+        </a>
+        <nav class="nav-links" role="navigation" aria-label="Primary">
+          <a href="./index.html" class="">Introduction</a>
+          <a href="./quickstart.html" class="">Quick Start</a>
+          <a href="./benchmark.html" class="active">BenchMark</a>
+          <a href="./faqs.html" class="">FAQs</a>
+        </nav>
+      </div>
+    </div>
+    
+  
+    <section class="page-hero">
+      <div class="container" style="padding:42px 24px 28px">
+        <div class="kicker">Results</div>
+        <h1>BenchMark</h1>
+        <p class="sub">Interactively explore throughput, MAT, and speedup across model pairs.</p>
+      </div>
+    </section>
+
+    <main class="container" style="display:flex; flex-direction:column; gap:18px">
+      <div class="controls">
+        <div class="select">
+          <label for="batch-select">Batch Size</label>
+          <select id="batch-select" aria-label="batch size"></select>
+        </div>
+        <div class="select">
+          <label for="dataset-select">Dataset</label>
+          <select id="dataset-select" aria-label="dataset"></select>
+        </div>
+        <button type="button" class="btn-visualize" id="visualize-toggle" aria-expanded="false">
+          Visualize
+        </button>
+        <div class="tip-text" role="note">(Click to visualize PEARL speedup!)</div>
+      </div>
+
+      <div class="card settings-card">
+        <div class="settings-header">
+          <h2 class="settings-title">Benchmark Settings</h2>
+          <p class="settings-sub">Shared evaluation configuration across all datasets.</p>
+        </div>
+        <dl class="settings-grid">
+          <div class="setting">
+            <dt>Hardware</dt>
+            <dd>NVIDIA H200</dd>
+          </div>
+          <div class="setting">
+            <dt>Draft TP</dt>
+            <dd>1</dd>
+          </div>
+          <div class="setting">
+            <dt>Target TP</dt>
+            <dd>2</dd>
+          </div>
+          <div class="setting">
+            <dt>Num questions / dataset</dt>
+            <dd>128</dd>
+          </div>
+          <div class="setting">
+            <dt>Temperature</dt>
+            <dd>0</dd>
+          </div>
+          <div class="setting">
+            <dt>Max tokens</dt>
+            <dd>200</dd>
+          </div>
+          <div class="setting">
+            <dt>Dtype</dt>
+            <dd>bfloat16</dd>
+          </div>
+          <div class="setting">
+            <dt>Random seed</dt>
+            <dd>0</dd>
+          </div>
+        </dl>
+        <p class="settings-footnote">
+          All Qwen2.5 and Llama3 series entries use their respective Instruct checkpoints.
+        </p>
+      </div>
+
+      <div class="table-wrap card" id="table-card">
+        
+
+<table id="bench-table" aria-describedby="tbl-help">
+  <colgroup>
+    <col class="col-target">
+    <col class="col-draft">
+    <col class="col-throughput">
+    <col class="col-mat">
+    <col class="col-speedup">
+  </colgroup>
+  <thead>
+    <tr>
+      <th scope="col">Target model</th>
+      <th scope="col">Draft model</th>
+      <th scope="col">Throughput</th>
+      <th scope="col">MAT</th>
+      <th scope="col">Speedup</th>
+    </tr>
+  </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card chart-card is-hidden" id="chart-card" aria-hidden="true">
+        <canvas id="bench-chart" height="220"></canvas>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="./benchmark.js"></script>
+    
+  <footer class="footer">
+    <div class="container">
+      nano-PEARL • © 2025
+    </div>
+  </footer>
+  <script src="./site.js"></script>
+</body>
+</html>
