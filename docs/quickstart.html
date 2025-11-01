@@ -189,42 +189,20 @@ conda activate nano-pearl</code></pre>
 from nano_pearl import PEARLConfig, PEARLEngine, SamplingParams, logger
 
 def main():
-    parser = argparse.ArgumentParser(description="nano-PEARL quick Q&A example")
-    parser.add_argument("-q", "--question", default="Explain quantum computing in simple terms")
-    parser.add_argument("--draft-model", default="/path/to/draft/model")
-    parser.add_argument("--target-model", default="/path/to/target/model")
-    parser.add_argument("--draft-tp", type=int, default=1)
-    parser.add_argument("--target-tp", type=int, default=1)
-    parser.add_argument("--max-tokens", type=int, default=256)
-    parser.add_argument("--temperature", type=float, default=0.0)
-    args = parser.parse_args()
-
-    config = PEARLConfig(
-        args.draft-model if False else args.__dict__["draft-model"],  # compat for hyphenated arg names
-        args.target-model if False else args.__dict__["target-model"],
-        draft_tensor_parallel_size=args.__dict__["draft-tp"],
-        target_tensor_parallel_size=args.__dict__["target-tp"],
-        gpu_memory_utilization=0.9,
-    )
+    draft_model_path = "/path/to/draft/model"
+    target_model_path = "/path/to/target/model"
+    
+    config = PEARLConfig(draft_model_path, target_model_path, draft_tensor_parallel_size=1, target_tensor_parallel_size=1, gpu_memory_utilization=0.9)
     engine = PEARLEngine(config)
-
-    system = "You are a helpful assistant."
-    prompt = f"{system}\nQ: {args.question}\nA:"
-
-    sampling_params = SamplingParams(
-        temperature=args.temperature, max_tokens=args.__dict__["max-tokens"], ignore_eos=False
-    )
+    
+    prompt = "Explain quantum computing in simple terms"
+    sampling_params = SamplingParams(temperature=0.0, max_tokens=256, ignore_eos=False)
     engine.add_request(prompt, sampling_params)
-
+    
     output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate()
-    answer = output_text[0]
-    logger.info("Question:", color="yellow"); logger.info(args.question)
-    logger.info("Answer:", color="yellow"); logger.info(answer)
-    logger.info(
-        f"Tokens: {num_tokens[0]}, Time: {elapsed_time:.2f}s, "
-        f"Throughput: {num_tokens[0] / elapsed_time:.2f} tok/s, "
-        f"MAT: {sum(num_acc_tokens[0]) / len(num_acc_tokens[0])}"
-    )
+    logger.info(f"Completion:", color="yellow")
+    logger.info(f"{output_text[0]}")
+    logger.info(f"Tokens: {num_tokens[0]}, Time: {elapsed_time:.2f}s, Throughput: {num_tokens[0] / elapsed_time:.2f} tok/s, MAT: {sum(num_acc_tokens[0]) / len(num_acc_tokens[0])}")
 
 if __name__ == "__main__":
     main()</code></pre>
@@ -248,94 +226,113 @@ if __name__ == "__main__":
             <li>Warmup runs once with a short prompt to stabilize kernels and KV caches.</li>
           </ul>
           <p class="lead" style="margin:12px 0 6px"><em>Source (repo root: <code>bench.py</code>) — multi-batch/dataset benchmark:</em></p>
-<pre><code class="language-python">import argparse, time, itertools, os
-from typing import List
+<pre><code class="language-python">import sys
+import copy
+import argparse
+import os
+from random import seed
+import time
+import torch
 from nano_pearl import PEARLConfig, PEARLEngine, SamplingParams, logger
 
-def load_prompts(dataset: str | None, custom: List[str] | None, default_path: str = "static/default_prompts.txt") -> List[str]:
-    if custom:
-        return [p.strip() for p in custom if p.strip()]
-    src = dataset or default_path
-    if not os.path.exists(src):
-        logger.info(f"Dataset not found: {src}, falling back to simple defaults")
-        return [
-            "Explain quantum computing in simple terms.",
-            "Write a haiku about the ocean.",
-            "Summarize the benefits of unit testing.",
-        ]
-    with open(src, "r", encoding="utf-8") as f:
-        return [ln.strip() for ln in f if ln.strip()]
+def parse_args():
+    parser = argparse.ArgumentParser(description='PEARL Benchmark Tool')
+    
+    parser.add_argument('--draft-model', '-d', type=str, required=True,
+                        help='Draft model path (required)')
+    parser.add_argument('--target-model', '-t', type=str, required=True,
+                        help='Target model path (required)')
+    parser.add_argument('--draft-tp', type=int, default=1,
+                        help='Draft model tensor parallel size (default: 1)')
+    parser.add_argument('--target-tp', type=int, default=2,
+                        help='Target model tensor parallel size (default: 2)')
+    parser.add_argument('--gpu-memory-utilization', type=float, default=0.9,
+                        help='GPU memory utilization (default: 0.9)')
+    parser.add_argument('--temperature', '-temp', type=float, default=0.0,
+                        help='Sampling temperature (default: 0.0)')
+    parser.add_argument('--max-tokens', type=int, default=200,
+                        help='Maximum tokens to generate (default: 200)')
+    parser.add_argument('--ignore-eos', '-noeos', action='store_true',
+                        help='Ignore EOS token (default: False)')
+    parser.add_argument('--run-ar-benchmark', '-ar', action='store_true',
+                        help='Run AR (Autoregressive) benchmark (default: False)')
+    parser.add_argument('--custom-prompts', '-p', type=str, nargs='+',
+                        help='Custom prompts for benchmark')
+    parser.add_argument('--seed', type=int, default=0,
+                        help='Random seed (default: 0)')
+    parser.add_argument('--verbose', '-v', action='store_true',
+                        help='Verbose output (default: False)')
+    
+    return parser.parse_args()
 
-def batched(iterable, n):
-    it = iter(iterable)
-    while True:
-        chunk = list(itertools.islice(it, n))
-        if not chunk: break
-        yield chunk
-
-def run_batch(engine: PEARLEngine, prompts: List[str], max_tokens: int, temperature: float):
-    params = SamplingParams(temperature=temperature, max_tokens=max_tokens, ignore_eos=False)
-    for p in prompts:
-        engine.add_request(p, params)
-    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate()
-    return output_text, num_tokens, num_acc_tokens, elapsed_time
-
-def main():
-    ap = argparse.ArgumentParser(description="nano-PEARL batch benchmark")
-    ap.add_argument("--draft-model", required=True)
-    ap.add_argument("--target-model", required=True)
-    ap.add_argument("--draft-tp", type=int, default=1)
-    ap.add_argument("--target-tp", type=int, default=1)
-    ap.add_argument("--max-tokens", type=int, default=200)
-    ap.add_argument("--temperature", type=float, default=0.0)
-    ap.add_argument("--batch-size", type=int, default=4)
-    ap.add_argument("--batches", type=int, default=10)
-    ap.add_argument("--dataset", help="Path to prompts file (one per line)")
-    ap.add_argument("-p", "--custom-prompts", nargs="*", help="Inline prompts to override dataset/defaults")
-    ap.add_argument("--warmup", action="store_true", help="Run one warmup batch")
-    ap.add_argument("--run-ar-benchmark", action="store_true", help="Run AR baseline as a comparison")
-    ap.add_argument("-v", action="store_true", help="Verbose outputs")
-    args = ap.parse_args()
-
-    cfg = PEARLConfig(
-        args.__dict__["draft-model"], args.__dict__["target-model"],
-        draft_tensor_parallel_size=args.__dict__["draft-tp"],
-        target_tensor_parallel_size=args.__dict__["target-tp"],
-        gpu_memory_utilization=0.9,
-    )
-    engine = PEARLEngine(cfg)
-
-    prompts = load_prompts(args.dataset, args.custom_prompts)
-    def expand_prompts(bs, nb):
-        needed = bs * nb
-        if len(prompts) >= needed:
-            return prompts[:needed]
-        # Repeat/cycle to fill
-        return list(itertools.islice(itertools.cycle(prompts), needed))
-
-    all_prompts = expand_prompts(args.__dict__["batch-size"], args.batches)
-
-    if args.warmup:
-        logger.info("Warmup...", color="yellow")
-        run_batch(engine, all_prompts[:args.__dict__["batch-size"]], args.__dict__["max-tokens"], args.temperature)
-
-    t0 = time.time()
-    total_tokens = 0
-    total_batches = 0
-    for i, batch_prompts in enumerate(batched(all_prompts, args.__dict__["batch-size"])):
-        out, ntok, _, el = run_batch(engine, batch_prompts, args.__dict__["max-tokens"], args.temperature)
-        total_tokens += sum(ntok)
-        total_batches += 1
-        if args.v:
-            logger.info(f"Batch {i+1}: {len(batch_prompts)} reqs, {sum(ntok)} tok, {el:.2f}s, {sum(ntok)/el:.2f} tok/s")
-    t1 = time.time()
-
-    logger.info("\nSummary", color="yellow")
-    logger.info(f"Batches: {total_batches}, Batch size: {args.__dict['batch-size']}")
-    logger.info(f"Total tokens: {total_tokens}, Wall time: {t1-t0:.2f}s, Throughput: {total_tokens/(t1-t0):.2f} tok/s")
+def get_default_prompts():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    prompts_file = os.path.join(script_dir, 'static', 'default_prompts.txt')
+    with open(prompts_file, 'r', encoding='utf-8') as f:
+        prompts = [line.strip() for line in f.readlines() if line.strip()]
+    return prompts
 
 if __name__ == "__main__":
-    main()</code></pre>
+    args = parse_args()
+    
+    seed(args.seed)
+    draft_model_path = args.draft_model
+    target_model_path = args.target_model
+    config = PEARLConfig(
+        draft_model_path, 
+        target_model_path, 
+        draft_tensor_parallel_size=args.draft_tp, 
+        target_tensor_parallel_size=args.target_tp, 
+        gpu_memory_utilization=args.gpu_memory_utilization
+    )
+    engine = PEARLEngine(config)
+
+    # warmup
+    prompt = "Benchmark:"
+    sampling_params = SamplingParams(temperature=0, ignore_eos=False, max_tokens=512)
+    engine.add_request(prompt, sampling_params)
+    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate()
+    MAT = [sum(n) / len(n) for n in num_acc_tokens]
+    logger.info(f"[Warmup] Total: {sum(num_tokens)}tok, Time: {elapsed_time:.2f}s, Throughput: {sum(num_tokens) / elapsed_time:.2f}tok/s, MAT: {MAT}")
+
+    prompts = args.custom_prompts if args.custom_prompts else get_default_prompts()
+    sampling_params = SamplingParams(
+        temperature=args.temperature, 
+        ignore_eos=args.ignore_eos, 
+        max_tokens=args.max_tokens
+    )
+    for prompt in prompts:
+        engine.add_request(prompt, copy.deepcopy(sampling_params))
+
+    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.bench_generate(num_pearl_steps=100)
+    MAT = [sum(n) / len(n) for n in num_acc_tokens]
+
+    if args.verbose:
+        for prompt, output_text in zip(prompts, output_text):
+            logger.info(f"Prompt: \n{prompt}", color="yellow")
+            logger.info(f"Completion: \n{output_text}")
+
+    PEARL_throughput = sum(num_tokens) / elapsed_time
+    logger.info(f"num_tokens: {num_tokens}, MAT: {MAT}")
+    logger.info(f"[PEARL Generate] Batch Size: {len(prompts)} Total: {sum(num_tokens)}tok, Time: {elapsed_time:.2f}s, Throughput: {sum(num_tokens) / elapsed_time:.2f}tok/s, MAT: {MAT}")
+
+    if args.run_ar_benchmark:
+        sampling_params = SamplingParams(
+            temperature=args.temperature, 
+            ignore_eos=args.ignore_eos, 
+            max_tokens=args.max_tokens
+        )
+        for prompt in prompts:
+            engine.add_request(prompt, copy.deepcopy(sampling_params))
+
+        output_text, num_tokens, _, elapsed_time = engine.AR_generate()
+        if args.verbose:
+            for prompt, output_text in zip(prompts, output_text):
+                logger.info(f"Prompt: \n{prompt}", color="yellow")
+                logger.info(f"Completion: \n{output_text}")
+        AR_throughput = sum(num_tokens) / elapsed_time
+        logger.info(f"[AR Generate] Batch Size: {len(prompts)} Total: {sum(num_tokens)}tok, Time: {elapsed_time:.2f}s, Throughput: {sum(num_tokens) / elapsed_time:.2f}tok/s")
+        logger.info(f"PEARL Speedup: {PEARL_throughput / AR_throughput:.2f}x")</code></pre>
 
           <div class="callout info" style="margin-top:10px">
             <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M7 12h10M12 7v10"/></svg>
