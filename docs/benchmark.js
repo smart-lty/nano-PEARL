@@ -37,6 +37,14 @@ function fmt(n){
   return Number(n).toLocaleString(undefined, {maximumFractionDigits: 2});
 }
 
+function fmtFixed(n, digits=2){
+  if (n === null || n === undefined || isNaN(n)) return "—";
+  return Number(n).toLocaleString(undefined, {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  });
+}
+
 // Simplify model name heuristics; unify 'Meta-Llama' -> 'Llama-'
 function simplifyModelName(s){
   if(!s) return s;
@@ -91,19 +99,66 @@ function colorFor(str){
   return `hsl(${hue}deg, ${sat}%, ${light}%)`;
 }
 
-const state = { data:null, batch:null, dataset:null, chart:null, flatRows: [], chartVisible:false };
+const DATA_SOURCES = {
+  H200: "./bench_summary.md",
+  L40S: "./bench_summary_l40s.md"
+};
 
-function populateSelects(rows){
+const SETTINGS = {
+  H200: { hardware: "NVIDIA H200", targetTP: "2" },
+  L40S: { hardware: "NVIDIA L40S", targetTP: "4" }
+};
+
+const state = {
+  data: null,
+  batch: null,
+  dataset: null,
+  chart: null,
+  flatRows: [],
+  chartVisible: false,
+  sourceKey: "H200",
+  dataCache: new Map(),
+  selections: new Map()
+};
+
+function populateSelects(rows, preferredBatch, preferredDataset){
   const batches = unique(rows.map(r => r["Batch Size"])).map(x => Number(x)).sort(byNumber);
   const datasets = unique(rows.map(r => r["Benchmark"]));
   const bsel = document.getElementById("batch-select");
   const dsel = document.getElementById("dataset-select");
+  if(!bsel || !dsel){
+    return;
+  }
+  if(!rows || rows.length === 0){
+    bsel.innerHTML = "";
+    dsel.innerHTML = "";
+    state.batch = null;
+    state.dataset = null;
+    return;
+  }
   bsel.innerHTML = batches.map(b => `<option value="${b}">${b}</option>`).join("");
   dsel.innerHTML = datasets.map(d => `<option value="${d}">${d}</option>`).join("");
-  state.batch = batches[0]; state.dataset = datasets[0];
-  bsel.value = String(state.batch); dsel.value = state.dataset;
-  bsel.addEventListener("change", () => { state.batch = Number(bsel.value); render(); });
-  dsel.addEventListener("change", () => { state.dataset = dsel.value; render(); });
+  const preferredBatchNum = preferredBatch != null ? Number(preferredBatch) : null;
+  const batchValue = (preferredBatchNum != null && batches.includes(preferredBatchNum)) ? preferredBatchNum : batches[0];
+  const datasetValue = (preferredDataset && datasets.includes(preferredDataset)) ? preferredDataset : datasets[0];
+  state.batch = batchValue;
+  state.dataset = datasetValue;
+  bsel.value = String(batchValue);
+  dsel.value = datasetValue;
+  if(!bsel.dataset.bound){
+    bsel.addEventListener("change", () => {
+      state.batch = Number(bsel.value);
+      render();
+    });
+    bsel.dataset.bound = "1";
+  }
+  if(!dsel.dataset.bound){
+    dsel.addEventListener("change", () => {
+      state.dataset = dsel.value;
+      render();
+    });
+    dsel.dataset.bound = "1";
+  }
 
   const enhanceSelectHitArea = (sel) => {
     const wrapper = sel.closest(".select");
@@ -119,6 +174,59 @@ function populateSelects(rows){
 
   enhanceSelectHitArea(bsel);
   enhanceSelectHitArea(dsel);
+}
+
+async function loadDataSource(key){
+  const src = DATA_SOURCES[key];
+  if(!src){
+    throw new Error(`Unknown data source: ${key}`);
+  }
+  if(state.dataCache.has(key)){
+    return state.dataCache.get(key);
+  }
+  const data = await loadMarkdownTable(src);
+  if(!data || !data.rows || data.rows.length === 0){
+    throw new Error(`Parsed 0 rows from ${src}`);
+  }
+  state.dataCache.set(key, data);
+  return data;
+}
+
+function showTableLoading(){
+  const tbody = document.querySelector("#bench-table tbody");
+  if(tbody){
+    tbody.innerHTML = `<tr><td colspan="5" class="loading-cell">Loading...</td></tr>`;
+  }
+}
+
+function showTableError(err){
+  const tbody = document.querySelector("#bench-table tbody");
+  if(tbody){
+    tbody.innerHTML = `<tr><td colspan="5" class="error-cell">Failed to load data: ${String(err.message || err)}</td></tr>`;
+  }
+}
+
+function updateHardwareToggle(activeKey){
+  const buttons = document.querySelectorAll(".hardware-toggle .chip-option");
+  buttons.forEach(btn => {
+    const isActive = btn.dataset.hardware === activeKey;
+    btn.classList.toggle("is-active", isActive);
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+}
+
+function setHardwareButtonsDisabled(disabled){
+  const buttons = document.querySelectorAll(".hardware-toggle .chip-option");
+  buttons.forEach(btn => { btn.disabled = disabled; });
+}
+
+function applySettings(key){
+  const cfg = SETTINGS[key];
+  if(!cfg) return;
+  const hwEl = document.querySelector('[data-setting="hardware"]');
+  const targetEl = document.querySelector('[data-setting="target-tp"]');
+  if(hwEl) hwEl.textContent = cfg.hardware;
+  if(targetEl) targetEl.textContent = cfg.targetTP;
 }
 
 function setChartVisibility(show){
@@ -145,6 +253,55 @@ function setChartVisibility(show){
     state.chart.destroy();
     state.chart = null;
   }
+}
+
+async function setHardware(key){
+  if(!DATA_SOURCES[key]) return;
+  const previousKey = state.sourceKey;
+  if(state.data && previousKey){
+    state.selections.set(previousKey, {batch: state.batch, dataset: state.dataset});
+  }
+  updateHardwareToggle(key);
+  applySettings(key);
+  setHardwareButtonsDisabled(true);
+  showTableLoading();
+  try{
+    const data = await loadDataSource(key);
+    const stored = state.selections.get(key) || {};
+    state.sourceKey = key;
+    state.data = data;
+    populateSelects(data.rows, stored.batch, stored.dataset);
+    render();
+  }catch(err){
+    console.error(err);
+    const fallbackKey = previousKey || state.sourceKey;
+    if(fallbackKey){
+      state.sourceKey = fallbackKey;
+      applySettings(fallbackKey);
+      updateHardwareToggle(fallbackKey);
+    }
+    if(state.data){
+      render();
+    }else{
+      showTableError(err);
+    }
+  }finally{
+    setHardwareButtonsDisabled(false);
+  }
+}
+
+function initHardwareToggle(){
+  const buttons = document.querySelectorAll(".hardware-toggle .chip-option");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.hardware;
+      if(key && key !== state.sourceKey){
+        setHardware(key);
+      }
+    });
+  });
+  updateHardwareToggle(state.sourceKey);
+  applySettings(state.sourceKey);
 }
 
 function initVisualToggle(){
@@ -177,8 +334,8 @@ function renderTable(groups){
           <span class="model-name">None</span>
         </td>
         <td class="col-throughput">${fmt(ar_tp)} tok/s</td>
-        <td class="col-mat">${fmt(ar_mat)}</td>
-        <td class="speedup-col">1x</td>
+        <td class="col-mat">${fmtFixed(ar_mat)}</td>
+        <td class="speedup-col">${fmtFixed(1)}x</td>
       </tr>`
     );
 
@@ -195,8 +352,8 @@ function renderTable(groups){
             <span class="model-name">${dSimple}</span>
           </td>
           <td class="col-throughput">${fmt(pearl_tp)} tok/s</td>
-          <td class="col-mat">${fmt(mat)}</td>
-          <td class="speedup-col">${isFinite(s)? fmt(s)+'x':'—'}</td>
+          <td class="col-mat">${fmtFixed(mat)}</td>
+          <td class="speedup-col">${isFinite(s)? fmtFixed(s)+'x':'—'}</td>
         </tr>`
       );
       state.flatRows.push({
@@ -359,7 +516,7 @@ function renderChart(){
             if(!ctx || !ctx.length) return '';
             const idx = ctx[0].dataIndex;
             const s = speedups[idx];
-            return (s && isFinite(s)) ? `Speedup: ${s.toFixed(2)}x` : '';
+            return (s && isFinite(s)) ? `Speedup: ${fmtFixed(s)}x` : '';
           }
         }
       }
@@ -425,7 +582,7 @@ const speedupCallouts = {
       const speed = speedups[idx];
       if(!(speed > 0 && isFinite(speed))) return;
 
-      const text = `${speed.toFixed(2)}x`;
+      const text = `${fmtFixed(speed)}x`;
       const metrics = ctx.measureText(text);
       const paddingX = 12;
       const height = 24;
@@ -457,6 +614,7 @@ const speedupCallouts = {
 };
 
 function render(){
+  if(!state.data || !state.data.rows) return;
   const groups = buildGroups(state.data.rows, state.batch, state.dataset);
   renderTable(groups);
   if(state.chartVisible){
@@ -469,22 +627,11 @@ function render(){
 
 (async function main(){
   try{
-    const data = await loadMarkdownTable("./bench_summary.md");
-    if(!data || !data.rows || data.rows.length === 0){
-      throw new Error("Parsed 0 rows from bench_summary.md");
-    }
-    state.data = data;
-    populateSelects(data.rows);
+    initHardwareToggle();
     initVisualToggle();
-    render();
-    setChartVisibility(false);
+    await setHardware("H200");
   }catch(err){
     console.error(err);
-    const tbody = document.querySelector("#bench-table tbody");
-    if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="5" style="color:#b00;font-weight:700">
-        Failed to load data: ${String(err.message || err)}
-      </td></tr>`;
-    }
+    showTableError(err);
   }
 })();

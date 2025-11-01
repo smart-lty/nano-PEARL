@@ -49,6 +49,10 @@
 
     <main class="container" style="display:flex; flex-direction:column; gap:18px">
       <div class="controls">
+        <div class="hardware-toggle" role="group" aria-label="Hardware preset">
+          <button type="button" class="chip-option is-active" data-hardware="H200">H200</button>
+          <button type="button" class="chip-option" data-hardware="L40S">L40S</button>
+        </div>
         <div class="select">
           <label for="batch-select">Batch Size</label>
           <select id="batch-select" aria-label="batch size"></select>
@@ -60,7 +64,7 @@
         <button type="button" class="btn-visualize" id="visualize-toggle" aria-expanded="false">
           Visualize
         </button>
-        <div class="tip-text" role="note">(Click to visualize PEARL speedup!)</div>
+        <div class="tip-text" role="note">(Click these buttons for more interesting results!)</div>
       </div>
 
       <div class="card settings-card">
@@ -71,7 +75,7 @@
         <dl class="settings-grid">
           <div class="setting">
             <dt>Hardware</dt>
-            <dd>NVIDIA H200</dd>
+            <dd data-setting="hardware">NVIDIA H200</dd>
           </div>
           <div class="setting">
             <dt>Draft TP</dt>
@@ -79,7 +83,7 @@
           </div>
           <div class="setting">
             <dt>Target TP</dt>
-            <dd>2</dd>
+            <dd data-setting="target-tp">2</dd>
           </div>
           <div class="setting">
             <dt>Num questions / dataset</dt>
