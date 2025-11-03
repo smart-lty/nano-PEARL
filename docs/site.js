@@ -101,3 +101,54 @@
     }
   }catch(e){ /* no-op */ }
 })();
+
+  // Copy-to-clipboard buttons (Quick Start)
+  document.addEventListener('click', function(evt){
+    var btn = evt.target.closest('.btn-copy');
+    if(!btn) return;
+    evt.preventDefault();
+    evt.stopPropagation();
+    var targetSel = btn.getAttribute('data-copy-target');
+    if(!targetSel) return;
+    var codeEl = document.querySelector(targetSel);
+    if(!codeEl) return;
+    var raw = codeEl.textContent || '';
+    var text = raw.replace(/ /g, ' ');
+    var defaultLabel = btn.getAttribute('data-label') || btn.textContent.trim() || 'Copy';
+
+    function setState(label, state){
+      btn.textContent = label;
+      if(state){ btn.setAttribute('data-state', state); }
+      else{ btn.removeAttribute('data-state'); }
+    }
+
+    function notify(success){
+      if(success){
+        setState('Copied', 'copied');
+        setTimeout(function(){ setState(defaultLabel); }, 1800);
+      }else{
+        setState('Copy failed', 'error');
+        setTimeout(function(){ setState(defaultLabel); }, 1800);
+      }
+    }
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ notify(true); }, function(){ notify(false); });
+    }else{
+      try{
+        var area = document.createElement('textarea');
+        area.value = text;
+        area.style.position = 'fixed';
+        area.style.top = '-9999px';
+        document.body.appendChild(area);
+        area.focus();
+        area.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        notify(ok);
+      }catch(err){
+        notify(false);
+      }
+    }
+  }, true);
+

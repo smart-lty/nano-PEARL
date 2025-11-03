@@ -1,36 +1,30 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Quick Start • nano-PEARL</title>
-  <meta name="color-scheme" content="dark light">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css"/>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Quick Start • nano-PEARL</title>
+<meta content="dark light" name="color-scheme"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&amp;family=Lora:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="./styles.css" rel="stylesheet"/>
+<style>
     /* Page-scoped enhancements for Quick Start */
     html{ scroll-behavior: smooth }
-    body.qs main{display:grid; grid-template-columns: 280px 1fr; gap:24px}
-    /* Align content with hero text: shift content left, push ToC further left */
-    body.qs .toc{position: sticky; top:84px; align-self:start; width:280px; margin-left: calc(-280px - 24px)}
-    body.qs .kblocks{margin-left: calc(-280px - 24px); width: calc(100% + 280px + 24px)}
-    @media (max-width: 980px){
-      body.qs main{grid-template-columns: 1fr}
-      body.qs .toc{position:static; margin-left:0; width:auto}
-      body.qs .kblocks{margin-left:0; width:auto}
-    }
+    body.qs main{display:flex; gap:32px; align-items:flex-start}
+    body.qs .toc{position: sticky; top:84px; align-self:flex-start; width:250px}
     body.qs .toc .card{padding:18px; border-radius:14px}
     body.qs .toc h3{margin:0 0 8px; font-family:'Poppins', ui-sans-serif; font-size:14px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
     body.qs .toc a{display:block; padding:8px 10px; border-radius:10px; color:var(--muted); font-weight:600}
     body.qs .toc a:hover{background:#fff; color:var(--text); box-shadow:0 0 0 2px var(--ring)}
 
+    body.qs .kblocks{flex:1; display:flex; flex-direction:column; gap:18px}
     body.qs .section.card{padding:24px}
-    body.qs .section{ scroll-margin-top: 96px }
+    body.qs .section{scroll-margin-top: 96px}
     body.qs .section h2{margin:0 0 6px; font-family:'Poppins', ui-sans-serif}
     body.qs .section .lead{color:var(--muted); margin:0 0 12px}
-    body.qs .kblocks{display:grid; gap:18px}
     body.qs .kgrid{display:grid; gap:14px; grid-template-columns: repeat(auto-fit, minmax(220px,1fr))}
 
     /* Callouts */
@@ -42,19 +36,38 @@
 
     /* Code blocks */
     body.qs pre{
-      margin:10px 0;
+      margin:0;
       background:#f5f5f5;
       border:1px solid #e5e5e5;
       border-left:3px solid #d9d9d9;
       border-radius:12px;
-      padding:12px;
+      padding:12px 18px;
       overflow:auto;
       box-shadow: 0 3px 10px rgba(20,20,19,0.05);
     }
+    body.qs .code-block{position:relative}
+    body.qs .code-block pre{padding:12px 18px; padding-right:72px}
     body.qs code{
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, Liberation Mono, monospace;
       color: #1f2937;
     }
+
+    body.qs p code, body.qs li code, body.qs .lbl code, body.qs .settings-footnote code{color:var(--accent-2); font-weight:600}
+
+    body.qs details.code-card{border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:0 2px 10px rgba(20,20,19,0.05); margin-top:12px}
+    body.qs details.code-card summary{padding:14px 18px; cursor:pointer; display:flex; align-items:center; gap:12px; font-family:'Poppins', ui-sans-serif; font-weight:600; list-style:none}
+    body.qs details.code-card summary::-webkit-details-marker{display:none}
+    body.qs details.code-card summary::before{content:"▸"; font-size:13px; transform:rotate(0deg); transition: transform .2s ease; color:var(--muted)}
+    body.qs details[open].code-card summary::before{transform:rotate(90deg)}
+    body.qs .code-block .code-toolbar{position:absolute; top:12px; left:18px; right:18px; display:flex; align-items:center; justify-content:flex-end; gap:12px; pointer-events:none}
+    body.qs .code-block.tight .code-toolbar{top:6px}
+    body.qs .code-block .code-toolbar > *{pointer-events:auto}
+    body.qs .code-block .code-toolbar a{font-weight:600; font-size:13px; color:var(--accent-2); margin-right:auto}
+    body.qs .code-block .code-toolbar a:hover{text-decoration:underline}
+    body.qs .btn-copy{padding:6px 12px; border-radius:8px; border:1px solid rgba(107,106,100,0.4); background:#f6f3eb; font-family:'Poppins', ui-sans-serif; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition: all .2s ease}
+    body.qs .btn-copy:hover{border-color:var(--accent-2); color:var(--accent-2)}
+    body.qs .btn-copy[data-state="copied"]{background:var(--accent-2); color:#fff; border-color:var(--accent-2)}
+    body.qs .btn-copy[data-state="error"]{background:rgba(217,119,87,0.16); color:var(--accent); border-color:var(--accent)}
 
     /* Mini tiles */
     body.qs .tile{background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px}
@@ -78,155 +91,192 @@
     .tok-opt{ color:#6f42c1 }
     .tok-var{ color:#e36209 }
     .tok-path{ color:#24292e; font-style: italic }
+
+    @media (max-width: 980px){
+      body.qs main{flex-direction:column}
+      body.qs .toc{position:static; width:auto}
+      body.qs .code-block .code-toolbar{left:16px; right:16px}
+      body.qs .code-block pre{padding:12px 16px; padding-right:70px}
+    }
   </style>
 </head>
 <body class="qs">
-  
-    <div class="nav">
-      <div class="nav-inner">
-        <a class="logo" href="./index.html" aria-label="nano-PEARL Home">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 12c5-9 11-9 16 0" stroke="url(#g1)" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M4 12c5 9 11 9 16 0" stroke="url(#g2)" stroke-width="2.2" stroke-linecap="round"/>
-            <defs>
-              <linearGradient id="g1" x1="4" x2="20" y1="12" y2="12">
-                <stop stop-color="#9AE6B4"/><stop offset="1" stop-color="#8AB4F8"/>
-              </linearGradient>
-              <linearGradient id="g2" x1="4" x2="20" y1="12" y2="12">
-                <stop stop-color="#8AB4F8"/><stop offset="1" stop-color="#9AE6B4"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <span class="sig">nano-PEARL</span>
-        </a>
-        <nav class="nav-links" role="navigation" aria-label="Primary">
-          <a href="./index.html" class="">Introduction</a>
-          <a href="./quickstart.html" class="active">Quick Start</a>
-          <a href="./benchmark.html" class="">BenchMark</a>
-          <a href="./faqs.html" class="">FAQs</a>
-        </nav>
-      </div>
-    </div>
-    
-  
-    <section class="page-hero">
-      <div class="container" style="padding:42px 24px 28px">
-        <div class="kicker">Docs</div>
-        <h1>Quick Start</h1>
-        <p class="sub">Install, run, reproduce. Minimal steps for nano-PEARL.</p>
-      </div>
-    </section>
-    <main class="container">
-      <aside class="toc reveal">
-        <div class="card">
-          <h3>On this page</h3>
-          <a href="#overview">Overview</a>
-          <a href="#install">Installation</a>
-          <a href="#basic">Basic Usage</a>
-          <a href="#examples">Examples</a>
-          <a href="#tips">Troubleshooting</a>
-        </div>
-      </aside>
-
-      <section class="kblocks">
-        <!-- Overview -->
-        <div id="overview" class="section card reveal">
-          <h2>Overview</h2>
-          <p class="lead">Prerequisites and sensible defaults.</p>
-          <div class="kgrid" style="margin-top:6px">
-            <dl class="tile"><dt>Python</dt><dd>&ge; 3.12</dd></dl>
-            <dl class="tile"><dt>PyTorch</dt><dd>&ge; 2.4</dd></dl>
-            <dl class="tile"><dt>CUDA</dt><dd>12.x</dd></dl>
-            <dl class="tile"><dt>Draft TP</dt><dd>1</dd></dl>
-            <dl class="tile"><dt>Target TP</dt><dd>1–2</dd></dl>
-            <dl class="tile"><dt>Dtype</dt><dd>bfloat16</dd></dl>
-          </div>
-          <p class="settings-footnote" style="margin-top:10px">Install tips included below for torch/flash-attn ordering.</p>
-        </div>
-
-        <!-- 1) Installation -->
-        <div id="install" class="section card reveal">
-          <h2>1. Installation</h2>
-          <p class="lead">
-            nano-PEARL builds on <a href="https://github.com/GeeeekExplorer/nano-vllm" target="_blank" rel="noreferrer">nano-vllm</a>.
+<div class="nav">
+<div class="nav-inner">
+<a aria-label="nano-PEARL Home" class="logo" href="./index.html">
+<svg aria-hidden="true" fill="none" viewbox="0 0 24 24">
+<path d="M4 12c5-9 11-9 16 0" stroke="url(#g1)" stroke-linecap="round" stroke-width="2.2"></path>
+<path d="M4 12c5 9 11 9 16 0" stroke="url(#g2)" stroke-linecap="round" stroke-width="2.2"></path>
+<defs>
+<lineargradient id="g1" x1="4" x2="20" y1="12" y2="12">
+<stop stop-color="#9AE6B4"></stop><stop offset="1" stop-color="#8AB4F8"></stop>
+</lineargradient>
+<lineargradient id="g2" x1="4" x2="20" y1="12" y2="12">
+<stop stop-color="#8AB4F8"></stop><stop offset="1" stop-color="#9AE6B4"></stop>
+</lineargradient>
+</defs>
+</svg>
+<span class="sig">nano-PEARL</span>
+</a>
+<nav aria-label="Primary" class="nav-links" role="navigation">
+<a class="" href="./index.html">Introduction</a>
+<a class="active" href="./quickstart.html">Quick Start</a>
+<a class="" href="./benchmark.html">BenchMark</a>
+<a class="" href="./faqs.html">FAQs</a>
+</nav>
+</div>
+</div>
+<section class="page-hero">
+<div class="container" style="padding:42px 24px 28px">
+<div class="kicker">Docs</div>
+<h1>Quick Start</h1>
+<p class="sub">Install, run, reproduce. Minimal steps for nano-PEARL.</p>
+</div>
+</section>
+<main class="container">
+<aside class="toc reveal">
+<div class="card">
+<h3>On this page</h3>
+<a href="#overview">Overview</a>
+<a href="#install">Installation</a>
+<a href="#basic">Basic Usage</a>
+<a href="#simple-benchmark">Simple Benchmark</a>
+<a href="#tips">Troubleshooting</a>
+</div>
+</aside>
+<section class="kblocks">
+<!-- Overview -->
+<div class="section card reveal" id="overview">
+<h2>Overview</h2>
+<p class="lead">Prerequisites and sensible defaults.</p>
+<div class="kgrid" style="margin-top:6px">
+<dl class="tile"><dt>Python</dt><dd>≥ 3.12</dd></dl>
+<dl class="tile"><dt>PyTorch</dt><dd>≥ 2.4</dd></dl>
+<dl class="tile"><dt>CUDA</dt><dd>12.x</dd></dl>
+<dl class="tile"><dt>Draft TP</dt><dd>1</dd></dl>
+<dl class="tile"><dt>Target TP</dt><dd>1, 2, 4</dd></dl>
+<dl class="tile"><dt>Dtype</dt><dd>bfloat16</dd></dl>
+</div>
+<p class="tp-footnote" style="margin-top:10px; color: var(--accent); font-size: 13px;">Future release: additional tensor-parallel sizes (e.g. 6, 7) will be supported.</p></div>
+<!-- 1) Installation -->
+<div class="section card reveal" id="install">
+<h2>1. Installation</h2>
+<p class="lead">
+            nano-PEARL builds on <a href="https://github.com/GeeeekExplorer/nano-vllm" rel="noreferrer" target="_blank">nano-vllm</a>.
             We recommend Python 3.12 and installing from source with <code>uv</code> (or <code>pip</code>).
           </p>
-          <h3>1.1 Create environment</h3>
-<pre><code class="language-bash">conda create -n nano-pearl python=3.12 -y
+<h3>1.1 Create environment</h3>
+<div class="code-block tight">
+  <div class="code-toolbar"><button class="btn-copy" data-copy-target="#qs-snippet-a7e3eb70" data-label="Copy" type="button">Copy</button></div>
+  <pre><code class="language-bash" id="qs-snippet-a7e3eb70">conda create -n nano-pearl python=3.12 -y
 conda activate nano-pearl</code></pre>
-          <h3>1.2 Install package</h3>
-          <div class="kgrid">
-            <div>
-              <div class="lbl" style="margin-bottom:8px">From source (recommended)</div>
-<pre><code class="language-bash">uv pip install -e .</code></pre>
-            </div>
-            <div>
-              <div class="lbl" style="margin-bottom:8px">From GitHub</div>
-<pre><code class="language-bash">pip install git+https://github.com/smart-lty/nano-PEARL.git</code></pre>
-            </div>
-          </div>
-          <div class="callout info" style="margin-top:10px">
-            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 11h2v5h-2"/></svg>
-            <div>
-              <strong>Install tips</strong>
-              <div>If <code>flash-attn</code> build complains about missing <code>torch</code>, install a matching PyTorch first, then rerun. Prefer prebuilt wheels for your CUDA/PyTorch combo if available.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2) Basic Usage -->
-        <div id="basic" class="section card reveal">
-          <h2>2. Basic Usage</h2>
-          <p class="lead">
+</div>
+<h3>1.2 Install package</h3>
+<div class="kgrid">
+<div>
+<div class="lbl" style="margin-bottom:8px">From source (recommended)</div>
+<div class="code-block tight">
+  <div class="code-toolbar"><button class="btn-copy" data-copy-target="#qs-snippet-008d8c08" data-label="Copy" type="button">Copy</button></div>
+  <pre><code class="language-bash" id="qs-snippet-008d8c08">uv pip install -e .</code></pre>
+</div>
+</div>
+<div>
+<div class="lbl" style="margin-bottom:8px">From GitHub</div>
+<div class="code-block tight">
+  <div class="code-toolbar"><button class="btn-copy" data-copy-target="#qs-snippet-30329a3d" data-label="Copy" type="button">Copy</button></div>
+  <pre><code class="language-bash" id="qs-snippet-30329a3d">pip install git+https://github.com/smart-lty/nano-PEARL.git</code></pre>
+</div>
+</div>
+</div>
+</div>
+<!-- 2) Basic Usage -->
+<div class="section card reveal" id="basic">
+<h2>2. Basic Usage</h2>
+<p class="lead">
             The API mirrors vLLM / nano-vllm. Provide both a <strong>draft</strong> model and a <strong>target</strong> model with their tensor-parallel sizes.
           </p>
-
-          <h3 id="example-py" style="margin-top:8px">2.1 example.py</h3>
-          <p>Minimal single-request example on 2 GPUs (TP: 1 + 1). Edit paths, then run:</p>
-<pre><code class="language-bash">python example.py</code></pre>
-          <p class="lead" style="margin:12px 0 6px"><em>Source (repo root: <code>example.py</code>) — quick single-turn Q&A:</em></p>
-<pre><code class="language-python">import argparse
+<h3 id="example-py" style="margin-top:8px">2.1 example.py</h3>
+<p>Minimal single-request example on 2 GPUs (TP: 1 + 1). Edit paths, then run:</p>
+<div class="code-block tight">
+  <div class="code-toolbar"><button class="btn-copy" data-copy-target="#qs-snippet-47434a93" data-label="Copy" type="button">Copy</button></div>
+  <pre><code class="language-bash" id="qs-snippet-47434a93">python example.py</code></pre>
+</div>
+<p class="lead" style="margin:12px 0 6px"><em><a href="https://github.com/smart-lty/nano-PEARL/blob/main/example.py" rel="noreferrer" target="_blank">example.py on GitHub</a> — quick single-turn Q&amp;A.</em></p>
+<details class="code-card" id="example-source">
+<summary>View example.py source</summary>
+<div class="code-block">
+  <div class="code-toolbar"><a href="https://github.com/smart-lty/nano-PEARL/blob/main/example.py" rel="noreferrer" target="_blank">Open in repository</a><button class="btn-copy" data-copy-target="#qs-example-source" data-label="Copy" type="button">Copy</button></div>
+  <pre><code class="language-python" id="qs-example-source">import argparse
 from nano_pearl import PEARLConfig, PEARLEngine, SamplingParams, logger
+
 
 def main():
     draft_model_path = "/path/to/draft/model"
     target_model_path = "/path/to/target/model"
-    
-    config = PEARLConfig(draft_model_path, target_model_path, draft_tensor_parallel_size=1, target_tensor_parallel_size=1, gpu_memory_utilization=0.9)
+
+    config = PEARLConfig(
+        draft_model_path,
+        target_model_path,
+        draft_tensor_parallel_size=1,
+        target_tensor_parallel_size=1,
+        gpu_memory_utilization=0.9,
+    )
     engine = PEARLEngine(config)
-    
+
     prompt = "Explain quantum computing in simple terms"
-    sampling_params = SamplingParams(temperature=0.0, max_tokens=256, ignore_eos=False)
+    sampling_params = SamplingParams(
+        temperature=0.0,
+        max_tokens=256,
+        ignore_eos=False,
+    )
     engine.add_request(prompt, sampling_params)
-    
+
     output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate()
-    logger.info(f"Completion:", color="yellow")
-    logger.info(f"{output_text[0]}")
-    logger.info(f"Tokens: {num_tokens[0]}, Time: {elapsed_time:.2f}s, Throughput: {num_tokens[0] / elapsed_time:.2f} tok/s, MAT: {sum(num_acc_tokens[0]) / len(num_acc_tokens[0])}")
+    logger.info("Completion:", color="yellow")
+    logger.info(output_text[0])
+
+    throughput = num_tokens[0] / elapsed_time if elapsed_time else 0.0
+    mat = sum(num_acc_tokens[0]) / len(num_acc_tokens[0])
+    logger.info(
+        "Tokens: %d, Time: %.2fs, Throughput: %.2f tok/s, MAT: %.2f",
+        num_tokens[0],
+        elapsed_time,
+        throughput,
+        mat,
+    )
+
 
 if __name__ == "__main__":
     main()</code></pre>
-
-          <h3 id="bench-py">2.2 bench.py</h3>
-          <p>
+</div>
+</details>
+<h3 id="bench-py">2.2 bench.py</h3>
+<p>
             Batch benchmarking utility with warmup, optional AR baseline, and simple CLI.
-            You can use the defaults prompts under <code>static/default_prompts.txt</code> or more benchmarks under <code>benchmark/data</code>.
+            You can use the default prompts under <code>static/default_prompts.txt</code> or more benchmarks under <code>benchmark/data</code>.
           </p>
-          <p><strong>Common invocation:</strong></p>
-<pre><code class="language-bash">python bench.py \
+<p><strong>Common invocation:</strong></p>
+<div class="code-block">
+  <div class="code-toolbar"><button class="btn-copy" data-copy-target="#qs-snippet-9c3fbd9d" data-label="Copy" type="button">Copy</button></div>
+  <pre><code class="language-bash" id="qs-snippet-9c3fbd9d">python bench.py \
   --draft-model "/path/to/draft" \
   --target-model "/path/to/target" \
   --draft-tp 1 --target-tp 2 \
   --max-tokens 200 --temperature 0 \
   --run-ar-benchmark -v</code></pre>
-          <p><em>Notes:</em></p>
-          <ul>
-            <li><code>--ignore-eos</code>: generate until reaching <code>max_tokens</code> or EOS if omitted.</li>
-            <li><code>-p/--custom-prompts</code>: provide one or more prompts inline; otherwise defaults are used.</li>
-            <li>Warmup runs once with a short prompt to stabilize kernels and KV caches.</li>
-          </ul>
-          <p class="lead" style="margin:12px 0 6px"><em>Source (repo root: <code>bench.py</code>) — multi-batch/dataset benchmark:</em></p>
-<pre><code class="language-python">import sys
+</div>
+<p><em>Notes:</em></p>
+<ul>
+<li><code>--ignore-eos</code>: generate until reaching <code>max_tokens</code> or EOS if omitted.</li>
+<li><code>-p/--custom-prompts</code>: provide one or more prompts inline; otherwise defaults are used.</li>
+<li>Warmup runs once with a short prompt to stabilize kernels and KV caches.</li>
+</ul>
+<p class="lead" style="margin:12px 0 6px"><em><a href="https://github.com/smart-lty/nano-PEARL/blob/main/bench.py" rel="noreferrer" target="_blank">bench.py on GitHub</a> — multi-batch/dataset benchmark.</em></p>
+<details class="code-card" id="bench-source">
+<summary>View bench.py source</summary>
+<div class="code-block">
+  <div class="code-toolbar"><a href="https://github.com/smart-lty/nano-PEARL/blob/main/bench.py" rel="noreferrer" target="_blank">Open in repository</a><button class="btn-copy" data-copy-target="#qs-bench-source" data-label="Copy" type="button">Copy</button></div>
+  <pre><code class="language-python" id="qs-bench-source">import sys
 import copy
 import argparse
 import os
@@ -235,164 +285,252 @@ import time
 import torch
 from nano_pearl import PEARLConfig, PEARLEngine, SamplingParams, logger
 
+
 def parse_args():
-    parser = argparse.ArgumentParser(description='PEARL Benchmark Tool')
-    
-    parser.add_argument('--draft-model', '-d', type=str, required=True,
-                        help='Draft model path (required)')
-    parser.add_argument('--target-model', '-t', type=str, required=True,
-                        help='Target model path (required)')
-    parser.add_argument('--draft-tp', type=int, default=1,
-                        help='Draft model tensor parallel size (default: 1)')
-    parser.add_argument('--target-tp', type=int, default=2,
-                        help='Target model tensor parallel size (default: 2)')
-    parser.add_argument('--gpu-memory-utilization', type=float, default=0.9,
-                        help='GPU memory utilization (default: 0.9)')
-    parser.add_argument('--temperature', '-temp', type=float, default=0.0,
-                        help='Sampling temperature (default: 0.0)')
-    parser.add_argument('--max-tokens', type=int, default=200,
-                        help='Maximum tokens to generate (default: 200)')
-    parser.add_argument('--ignore-eos', '-noeos', action='store_true',
-                        help='Ignore EOS token (default: False)')
-    parser.add_argument('--run-ar-benchmark', '-ar', action='store_true',
-                        help='Run AR (Autoregressive) benchmark (default: False)')
-    parser.add_argument('--custom-prompts', '-p', type=str, nargs='+',
-                        help='Custom prompts for benchmark')
-    parser.add_argument('--seed', type=int, default=0,
-                        help='Random seed (default: 0)')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                        help='Verbose output (default: False)')
-    
+    parser = argparse.ArgumentParser(description="PEARL Benchmark Tool")
+
+    parser.add_argument(
+        "--draft-model",
+        "-d",
+        type=str,
+        required=True,
+        help="Draft model path (required)",
+    )
+    parser.add_argument(
+        "--target-model",
+        "-t",
+        type=str,
+        required=True,
+        help="Target model path (required)",
+    )
+    parser.add_argument(
+        "--draft-tp",
+        type=int,
+        default=1,
+        help="Draft model tensor parallel size (default: 1)",
+    )
+    parser.add_argument(
+        "--target-tp",
+        type=int,
+        default=2,
+        help="Target model tensor parallel size (default: 2)",
+    )
+    parser.add_argument(
+        "--gpu-memory-utilization",
+        type=float,
+        default=0.9,
+        help="GPU memory utilization (default: 0.9)",
+    )
+    parser.add_argument(
+        "--temperature",
+        "-temp",
+        type=float,
+        default=0.0,
+        help="Sampling temperature (default: 0.0)",
+    )
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=200,
+        help="Maximum tokens to generate (default: 200)",
+    )
+    parser.add_argument(
+        "--ignore-eos",
+        "-noeos",
+        action="store_true",
+        help="Ignore EOS token (default: False)",
+    )
+    parser.add_argument(
+        "--run-ar-benchmark",
+        "-ar",
+        action="store_true",
+        help="Run AR (Autoregressive) benchmark (default: False)",
+    )
+    parser.add_argument(
+        "--custom-prompts",
+        "-p",
+        type=str,
+        nargs='+',
+        help="Custom prompts for benchmark",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=0,
+        help="Random seed (default: 0)",
+    )
+    parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Verbose output (default: False)",
+    )
+
     return parser.parse_args()
+
 
 def get_default_prompts():
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    prompts_file = os.path.join(script_dir, 'static', 'default_prompts.txt')
-    with open(prompts_file, 'r', encoding='utf-8') as f:
+    prompts_file = os.path.join(script_dir, "static", "default_prompts.txt")
+    with open(prompts_file, "r", encoding="utf-8") as f:
         prompts = [line.strip() for line in f.readlines() if line.strip()]
     return prompts
 
+
 if __name__ == "__main__":
     args = parse_args()
-    
+
     seed(args.seed)
     draft_model_path = args.draft_model
     target_model_path = args.target_model
     config = PEARLConfig(
-        draft_model_path, 
-        target_model_path, 
-        draft_tensor_parallel_size=args.draft_tp, 
-        target_tensor_parallel_size=args.target_tp, 
-        gpu_memory_utilization=args.gpu_memory_utilization
+        draft_model_path,
+        target_model_path,
+        draft_tensor_parallel_size=args.draft_tp,
+        target_tensor_parallel_size=args.target_tp,
+        gpu_memory_utilization=args.gpu_memory_utilization,
     )
     engine = PEARLEngine(config)
 
     # warmup
     prompt = "Benchmark:"
-    sampling_params = SamplingParams(temperature=0, ignore_eos=False, max_tokens=512)
+    sampling_params = SamplingParams(
+        temperature=0,
+        ignore_eos=False,
+        max_tokens=512,
+    )
     engine.add_request(prompt, sampling_params)
     output_text, num_tokens, num_acc_tokens, elapsed_time = engine.generate()
-    MAT = [sum(n) / len(n) for n in num_acc_tokens]
-    logger.info(f"[Warmup] Total: {sum(num_tokens)}tok, Time: {elapsed_time:.2f}s, Throughput: {sum(num_tokens) / elapsed_time:.2f}tok/s, MAT: {MAT}")
+    throughput = (
+        sum(num_tokens) / elapsed_time if elapsed_time else 0.0
+    )
+    logger.info(
+        "[Warmup] Total: %stok, Time: %.2fs, Throughput: %.2f tok/s, MAT: %s",
+        sum(num_tokens),
+        elapsed_time,
+        throughput,
+        [sum(n) / len(n) for n in num_acc_tokens],
+    )
 
     prompts = args.custom_prompts if args.custom_prompts else get_default_prompts()
     sampling_params = SamplingParams(
-        temperature=args.temperature, 
-        ignore_eos=args.ignore_eos, 
-        max_tokens=args.max_tokens
+        temperature=args.temperature,
+        ignore_eos=args.ignore_eos,
+        max_tokens=args.max_tokens,
     )
     for prompt in prompts:
         engine.add_request(prompt, copy.deepcopy(sampling_params))
 
-    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.bench_generate(num_pearl_steps=100)
-    MAT = [sum(n) / len(n) for n in num_acc_tokens]</code></pre>
-
-          <div class="callout info" style="margin-top:10px">
-            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M7 12h10M12 7v10"/></svg>
-            <div>
-              <strong>Tip</strong>
-              <div>Choose <code>--target-tp</code> according to your available GPUs and model size; nano-PEARL currently supports static TP per model group.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3) Examples (Llama 3) -->
-        <div id="examples" class="section card reveal">
-          <h2>3. Examples — Llama&nbsp;3 series</h2>
-          <p>
-            Below are example pairings for Llama 3/3.1/3.2 checkpoints. Replace paths with your local
-            model locations or Hugging Face cache paths. Ensure tokenizer/arch compatibility between
-            draft and target.
+    output_text, num_tokens, num_acc_tokens, elapsed_time = engine.bench_generate(
+        num_pearl_steps=100
+    )
+    throughput = sum(num_tokens) / elapsed_time if elapsed_time else 0.0
+    logger.info(
+        "[Bench] Total: %stok, Time: %.2fs, Throughput: %.2f tok/s, MAT: %s",
+        sum(num_tokens),
+        elapsed_time,
+        throughput,
+        [sum(n) / len(n) for n in num_acc_tokens],
+    )</code></pre>
+</div>
+</details>
+<div class="callout info" style="margin-top:10px">
+<svg class="ico" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M7 12h10M12 7v10"></path></svg>
+<div>
+<strong>Tip</strong>
+<div>Choose <code>--target-tp</code> according to your available GPUs and model size; nano-PEARL currently supports static TP per model group.</div>
+</div>
+</div>
+</div>
+<!-- 3) Simple Benchmark -->
+<div class="section card reveal" id="simple-benchmark">
+<h2>3. Simple Benchmark</h2>
+<p>
+            Use <code>benchmark/bench_example.sh</code> to reproduce the default evaluation settings for nano-PEARL.
+            The script wires the same parameters shown on the <a href="./benchmark.html">Benchmark</a> page
+            (TP: 1/2, temperature 0, max tokens 200, optional AR baseline).
           </p>
-          <h3>3.1 Draft 8B → Target 70B</h3>
-<pre><code class="language-bash">python bench.py \
-  --draft-model "/models/meta-llama/Meta-Llama-3-8B-Instruct" \
-  --target-model "/models/meta-llama/Meta-Llama-3-70B-Instruct" \
-  --draft-tp 1 --target-tp 2 \
-  --max-tokens 200 --temperature 0 \
-  --run-ar-benchmark -v</code></pre>
-          <h3>3.2 Draft 3B (Llama&nbsp;3.2) → Target 8B</h3>
-<pre><code class="language-bash">python bench.py \
-  --draft-model "/models/meta-llama/Llama-3.2-3B-Instruct" \
-  --target-model "/models/meta-llama/Meta-Llama-3-8B-Instruct" \
-  --draft-tp 1 --target-tp 1 \
-  --max-tokens 200 --temperature 0 -v</code></pre>
-          <p>
-            For a quick single-request smoke test with Llama 3, you can also run <code>example.py</code>
-            after setting the same draft/target paths:
-          </p>
-<pre><code class="language-bash">python example.py</code></pre>
-        </div>
-
-        <!-- Troubleshooting -->
-        <div id="tips" class="section card reveal">
-          <h2>4. Troubleshooting</h2>
-          <div class="kgrid">
-            <div class="callout warn">
-              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
-              <div>
-                <strong>flash-attn build fails</strong>
-                <div>Install a torch build matching your CUDA first, then reinstall. Prefer prebuilt wheels when available.</div>
+<ol>
+<li>Download or point to local draft/target checkpoints.</li>
+<li>Run the helper script with your paths (dataset defaults to <code>all</code>):</li>
+</ol>
+<div class="code-block">
+  <div class="code-toolbar"><button class="btn-copy" data-copy-target="#qs-snippet-62e1d40f" data-label="Copy" type="button">Copy</button></div>
+  <pre><code class="language-bash" id="qs-snippet-62e1d40f">bash benchmark/bench_example.sh \
+  /models/meta-llama/Meta-Llama-3-8B-Instruct \
+  /models/meta-llama/Meta-Llama-3-70B-Instruct</code></pre>
+</div>
+<p style="margin-top:12px"><strong>Customize quickly:</strong></p>
+<ul>
+<li>Pass a dataset (e.g. <code>gsm8k</code>) as the third argument.</li>
+<li>Switch mode to <code>random</code> (fourth argument) to sample synthetic prompts.</li>
+</ul>
+<div class="code-block">
+  <div class="code-toolbar"><button class="btn-copy" data-copy-target="#qs-snippet-fa045805" data-label="Copy" type="button">Copy</button></div>
+  <pre><code class="language-bash" id="qs-snippet-fa045805">bash benchmark/bench_example.sh \
+  /path/to/draft \
+  /path/to/target \
+  gsm8k \
+  random</code></pre>
+</div>
+<div class="callout info" style="margin-top:12px">
+<svg class="ico" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 11h2v5h-2"></path></svg>
+<div>
+<strong>Outputs &amp; follow-up</strong>
+<div>
+                The script writes intermediate logs to <code>bench.log</code>. Compare results and richer breakdowns on the
+                <a href="./benchmark.html">interactive benchmark dashboard</a> or rerun with <code>--run-ar-benchmark</code> disabled if you only need PEARL runs.
               </div>
-            </div>
-            <div class="callout info">
-              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 11h2v5h-2"/></svg>
-              <div>
-                <strong>Slow first run</strong>
-                <div>Run a short warmup prompt to stabilize kernels and KV caches before measuring throughput.</div>
-              </div>
-            </div>
-          </div>
-          <!-- OOM block as a full-width row below -->
-          <div class="callout oom" style="margin-top:12px">
-            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="6" width="14" height="12" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
-            <div>
-              <strong>Out-of-Memory (OOM)</strong>
-              <div style="margin-top:6px"><em>Memory & Batching Parameters (pearl_config.py, pearl_engine.py)</em></div>
-              <ul style="margin:8px 0 0 18px">
-                <li><code>gpu_memory_utilization: float</code> — fraction of GPU memory reserved for KV cache. <strong>Key knob</strong>. Recommendation: <code>0.9</code>.</li>
-              </ul>
-              <div class="help" style="margin:6px 0 0">Note: tune the following based on GPU memory and deployment scenario.</div>
-              <ul style="margin:8px 0 0 18px">
-                <li><code>max_num_batched_tokens: int</code> — max tokens in a single batch (<code>batch_size * seq_len</code>). Recommendation: <code>16384</code> on 80GB (H100/A100); <code>8192</code> on 40GB.</li>
-                <li><code>max_num_seqs: int</code> — max concurrent sequences. Recommendation: <code>512</code> (80GB); <code>128</code>–<code>256</code> (40GB).
+</div>
+</div>
+</div>
+<!-- Troubleshooting -->
+<div class="section card reveal" id="tips">
+<h2>4. Troubleshooting</h2>
+<div class="kgrid">
+<div class="callout warn">
+<svg class="ico" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path></svg>
+<div>
+<strong>flash-attn build fails</strong>
+<div>Install a torch build matching your CUDA first, then reinstall. Prefer prebuilt wheels when available.</div>
+</div>
+</div>
+<div class="callout info">
+<svg class="ico" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 11h2v5h-2"></path></svg>
+<div>
+<strong>Slow first run</strong>
+<div>Run a short warmup prompt to stabilize kernels and KV caches before measuring throughput.</div>
+</div>
+</div>
+</div>
+<!-- OOM block as a full-width row below -->
+<div class="callout oom" style="margin-top:12px">
+<svg class="ico" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24"><rect height="12" rx="2" width="14" x="5" y="6"></rect><path d="M8 10h8M8 14h5"></path></svg>
+<div>
+<strong>Out-of-Memory (OOM)</strong>
+<div style="margin-top:6px"><em>Memory &amp; Batching Parameters (pearl_config.py, pearl_engine.py)</em></div>
+<ul style="margin:8px 0 0 18px">
+<li><code>gpu_memory_utilization: float</code> — fraction of GPU memory reserved for KV cache. <strong>Key knob</strong>. Recommendation: <code>0.9</code>.</li>
+</ul>
+<div class="help" style="margin:6px 0 0">Note: tune the following based on GPU memory and deployment scenario.</div>
+<ul style="margin:8px 0 0 18px">
+<li><code>max_num_batched_tokens: int</code> — max tokens in a single batch (<code>batch_size * seq_len</code>). Recommendation: <code>16384</code> on 80GB (H100/A100); <code>8192</code> on 40GB.</li>
+<li><code>max_num_seqs: int</code> — max concurrent sequences. Recommendation: <code>512</code> (80GB); <code>128</code>–<code>256</code> (40GB).
                 </li>
-                <li><code>max_model_len: int</code> — maximum context length (prompt + generated tokens).</li>
-                <li><code>set_gamma_batch_size: list[int]</code> — batch sizes for auto-tuning when <code>gamma = -1</code>. Recommendation: default <code>[1,2,4,8,16,32,64]</code>; reduce (e.g., <code>[1,2,4,8]</code>) on constrained GPUs.</li>
-              </ul>
-              <div class="help" style="margin-top:6px">Practical tip: if OOM occurs, first lower <code>max_num_batched_tokens</code> or <code>max_num_seqs</code>, then adjust <code>gpu_memory_utilization</code> slightly (e.g., 0.85).</div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-    </main>
-    
-  <footer class="footer">
-    <div class="container">
+<li><code>max_model_len: int</code> — maximum context length (prompt + generated tokens).</li>
+<li><code>set_gamma_batch_size: list[int]</code> — batch sizes for auto-tuning when <code>gamma = -1</code>. Recommendation: default <code>[1,2,4,8,16,32,64]</code>; reduce (e.g., <code>[1,2,4,8]</code>) on constrained GPUs.</li>
+</ul>
+<div class="help" style="margin-top:6px">Practical tip: if OOM occurs, first lower <code>max_num_batched_tokens</code> or <code>max_num_seqs</code>, then adjust <code>gpu_memory_utilization</code> slightly (e.g., 0.85).</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="container">
       nano-PEARL • © 2025
     </div>
-  </footer>
-  <script src="./site.js"></script>
+</footer>
+<script src="./site.js"></script>
 </body>
 </html>
