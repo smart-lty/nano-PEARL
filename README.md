@@ -2,10 +2,8 @@
 
 ![nano-pearl](static/nano_pearl.gif)
 
+[![Website](https://img.shields.io/badge/website-nano--PEARL-orange)](https://smart-lty.github.io/nano-PEARL/)
 [![Status](https://img.shields.io/badge/status-active-brightgreen)](#) 
-[![Python](https://img.shields.io/badge/python-%E2%89%A53.12-blue)](#)
-[![PyTorch](https://img.shields.io/badge/PyTorch-%E2%89%A52.4-EE4C2C)](#)
-[![CUDA](https://img.shields.io/badge/CUDA-12.x-76B900)](#)
 [![ArXiv](https://img.shields.io/badge/arXiv-2408.11850-b31b1b)](https://arxiv.org/abs/2408.11850)
 [![Conference](https://img.shields.io/badge/ICLR-2025-4B7BEC)](#)
 
@@ -15,12 +13,19 @@
 
 # 🚀 nano-PEARL
 
-nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine. It decouples Draft and Target models onto separate device groups and runs them concurrently with on-the-fly verification, prefix KV caching, CUDA Graphs, paged attention, flash attention and tensor parallelism — aiming for high throughput without sacrificing output quality.
+nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine that decouples Draft and Target models onto separate device groups. With on-the-fly verification, prefix KV caching, CUDA Graphs, paged attention, flash attention, and tensor parallelism, it delivers exceptional throughput while maintaining output quality.
+
+<font color="#ADD8E6">**Ready to jumpstart your research?** All advanced acceleration features are built-in—focus on your algorithm, not the engineering.</font>
+
+> <font color="#90EE90">✨ No more integration worries from aggressive reviewers!</font> 
 
 ## 🎉 Latest News
 
 🚧 **Coming Soon**: More updates and features are in development!
 
+📚 **Paper Collection**: We are seeking for papers that follows parallel speculative decoding paradigm! We are going to prepare a paper collection of these papers for more comprehensive understanding.
+- [2025.11] 🔥 We release more benchmark results of nano-PEARL on NVIDIA L40S!
+- [2025.11] 🔥 Our web page of [nano-PEARL](https://smart-lty.github.io/nano-PEARL/) is established!
 - [2025.10] 🔥 We release the source code of nano-PEARL. Any PR is warmly welcomed!
 
 ## ✨ Key Features
@@ -64,7 +69,7 @@ pip install git+https://github.com/smart-lty/nano-PEARL.git # from github
 
 ## 🚀 Quick Start
 
-The `nano-PEARL` API mirrors `vLLM` / `nano-vllm`'s interface. The main difference is in the `LLM` engine initialization, where you must **specify both a target model and a draft model**, along with their respective tensor-parallel (TP) sizes.
+The `nano-PEARL` API mirrors `vLLM` / `nano-vllm`'s interface. The main difference is in the `LLM` engine initialization, where you must **specify both a target model and a draft model**, along with their respective tensor-parallel (TP) sizes. Detailed Quick Start is included in [Quick Start](https://smart-lty.github.io/nano-PEARL/quickstart.html).
 
 See `example.py` for usage: a minimal example of running parallel speculative decoding on 2 GPUs (e.g., 1 for the target model, 1 for the draft model):
 
@@ -87,7 +92,11 @@ def main():
 
 ## 📊 BenchMark Results
 
-Coming Soon!
+We conduct extensive evaluation of nano-PEARL on various datasets / Hardware settings. Below is the evaluation of nano-PEARL with NVIDIA H200 on HumanEval with batch size 32. nano-PEARL achieves a maximal $3.06\times$ throughput speedup with **3546.72 tok/s** for 70B LLMs!
+
+Feel Free to check more benchmark results at our [benchmark page](https://smart-lty.github.io/nano-PEARL/benchmark.html)!
+
+![bench_example](static/benchmark_example.png)
 
 ## 📋 TODOs
 
@@ -96,9 +105,6 @@ Coming Soon!
 - [ ]  **Continuous Batching**: Support continuous batching and chunked prefill.
 - [ ]  **Adaptive Gamma**: Support dynamic `gamma` tuning based on context size and model's performance.
 - [ ]  **PEARL-2**: Support fine-tuning / distilling a PEARL-specific draft model for further acceleration.
-
-## 🐛 Bug Fixing
-Coming Soon!
 
 ## 🙏 Acknowledgements
 
