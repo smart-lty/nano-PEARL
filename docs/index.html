@@ -9,8 +9,161 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css"/>
+  <style>
+    /* Page-scoped enhancements for Introduction */
+    html{ scroll-behavior:smooth }
+    
+    /* --- 1. Hero Section Beautification --- */
+    .page-hero {
+      /* Subtle gradient background */
+      background: linear-gradient(175deg, rgba(154, 230, 180, 0.05), rgba(255, 255, 255, 0) 25%),
+                  linear-gradient(175deg, rgba(138, 180, 248, 0.08), rgba(255, 255, 255, 0) 30%);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 36px !important;
+    }
+    .page-hero .kicker {
+      font-family: 'Poppins', ui-sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+    }
+    /* Gradient text for the main H1 title */
+    .page-hero h1 {
+      font-size: 2.8rem !important;
+      font-weight: 700;
+      background-image: linear-gradient(90deg, #9AE6B4, #8AB4F8);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      padding-top: 4px;
+      letter-spacing: -0.01em;
+    }
+    .page-hero .sub {
+      font-size: 1.4rem !important;
+      margin-top: 8px !important;
+    }
+
+    /* --- 2. Main Content Wrapper --- */
+    body.intro .wrap{
+      padding-top:24px;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    body.intro .card.intro{padding:24px 26px; margin-bottom:16px}
+    
+    /* --- 3. Icons & Headings --- */
+    body.intro h2 {
+      margin: 0 0 16px;
+      font-family:'Poppins', ui-sans-serif;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+    body.intro h2 .icon {
+      font-size: 1.3rem;
+      margin-right: 10px;
+      line-height: 1;
+    }
+    /* Sub-feature headings (h3) */
+    body.intro h3 {
+      margin: 24px 0 8px;
+      font-family:'Poppins', ui-sans-serif;
+      font-size: 1.15em;
+      border-left: 3px solid #8AB4F8; /* Accent color border */
+      padding-left: 10px;
+    }
+    
+    body.intro ul{margin:8px 0 0 18px; padding-left: 10px;}
+    body.intro ul li{margin-bottom: 6px;}
+    body.intro .muted{color:var(--muted)}
+    
+    /* Make primary card text darker by default */
+    body.intro .card.intro p {
+      color: var(--text);
+      line-height: 1.6;
+    }
+    body.intro .card.intro p.muted{
+      color: var(--muted);
+    }
+
+    /* --- 4. Callout Box --- */
+    body.intro .callout{display:flex; flex-direction:column; gap:10px; padding:16px 18px; border-radius:12px; border:1px solid var(--line); background:#fff}
+    body.intro .callout.info{border-color: rgba(106,155,204,.35); background: rgba(106,155,204,.06)}
+    
+    body.intro .callout h3 {
+      margin: 0 0 4px;
+      font-size: 1.1em;
+      font-family:'Poppins', ui-sans-serif;
+      color: var(--text);
+      border-left: none; /* Override h3 default */
+      padding-left: 0;
+    }
+    body.intro .callout ul { margin-top: 4px; }
+    body.intro .callout li { font-weight: 500; color: var(--text); }
+
+    /* --- 5. Code & Images --- */
+    body.intro pre{
+      margin:10px 0;
+      background:#f5f5f5;
+      border:1px solid #e5e5e5;
+      border-left:3px solid #d9d9d9;
+      border-radius:12px;
+      padding:12px;
+      overflow:auto;
+      box-shadow: 0 3px 10px rgba(20,20,19,0.05);
+    }
+    body.intro code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, Liberation Mono, monospace;
+      color: #1f2937;
+    }
+    
+    .intro-image {
+      width: 100%;
+      max-width: 800px;
+      margin: 16px auto;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      display: block;
+      box-shadow: 0 4px 12px rgba(20,20,19,0.07);
+    }
+    .image-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    /* --- 6. Optimized Layout Grid --- */
+    .grid-2-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Responsive fallbacks for grids */
+    @media (max-width: 840px) {
+      .grid-2-col {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 768px) {
+      .image-grid {
+        grid-template-columns: 1fr;
+      }
+      .page-hero h1 { font-size: 2.2rem !important; }
+      .page-hero .sub { font-size: 1.2rem !important; }
+    }
+    
+    /* Footer refinement */
+    .footer {
+      border-top: 1px solid var(--line);
+      margin-top: 32px;
+    }
+  </style>
 </head>
-<body>
+<body class="intro">
   
     <div class="nav">
       <div class="nav-inner">
@@ -41,14 +194,125 @@
   
     <section class="page-hero">
       <div class="container" style="padding:42px 24px 28px">
-        <div class="kicker">Project</div>
-        <h1>nano-PEARL</h1>
-        <p class="sub">Parallel speculative decoding with adaptive draft length — a nano implementation.
-        </p>
+        <div class="kicker">A Project</div>
+        <h1>nano-PEARL: Unleashing Batch Throughput</h1>
+        <p class="sub">Reimagined Speculative Decoding with Parallelism and Adaptive Draft Length.</p>
       </div>
     </section>
+
     <main class="container">
-      <div class="card notice">Coming Soon!</div>
+      <div class="wrap">
+
+        <div class="card intro reveal" id="overview">
+          <h2><span class="icon">🚀</span>Overview</h2>
+          
+          <img src="./nano_pearl.jpg" alt="nano-PEARL logo and overview diagram" class="intro-image" style="max-width: 600px;">
+          
+          <p>Speculative decoding (SD) is a powerful technique for accelerating Large Language Model (LLM) inference. We are excited to introduce <strong>nano-PEARL</strong>, a single-node, multi-GPU parallel speculative decoding engine built for practical, high-throughput deployment and fast research iteration.</p>
+          <p>nano-PEARL's core design revolves around <strong>Draft-Target Disaggregation (DT)</strong>: it separates Draft and Target models onto dedicated device groups and runs them concurrently. By integrating production-grade accelerators—Prefix KV Cache, Paged/Flash Attention, CUDA Graphs, and Tensor Parallelism—it delivers exceptional throughput under heavy batch workloads without sacrificing output fidelity.</p>
+        </div>
+
+        <div class="card intro reveal" id="why">
+          <h2><span class="icon">❓</span>Why a New Parallel SD Engine?</h2>
+          <p>While speculative decoding has emerged as a breakthrough for accelerating LLM inference, the lack of robust, deployment-ready implementations has significantly hindered its adoption for real-world workloads. Many existing projects and papers demonstrate impressive speedups, but often suffer from critical limitations: they rely on idealized `bs=1` (batch size 1) demos that fail to represent production scenarios, they create new performance bottlenecks under large batches, or they force engineers to abandon essential system optimizations like Paged Attention. This creates a significant gap between algorithmic research and practical, high-throughput deployment. To bridge this gap, we built <strong>nano-PEARL</strong>—a purpose-built engine designed from the ground up to make parallel speculative decoding a first-class citizen in a modern, production-grade inference stack, ensuring that throughput scales with batch size.</p>
+          
+          <div class="callout info" style="margin-top: 20px;">
+            <h3>Key Capabilities of nano-PEARL</h3>
+            <ul>
+              <li><strong>High-Throughput Batch Inference:</strong> Engineered to excel at large batch sizes (`bs=32`+) and long contexts, not just `bs=1` demos.</li>
+              <li><strong>Native System Integration:</strong> Coexists perfectly with modern inference accelerators like Paged Attention, Flash Attention, and CUDA Graphs.</li>
+              <li><strong>Scalable Parallelism:</strong> Leverages Draft-Target Disaggregation and Tensor Parallelism to efficiently scale across multiple GPUs on a single node.</li>
+              <li><strong>Resource-Efficient:</strong> Avoids resource contention and optimizes VRAM usage through Prefix KV Caching and independent model device placement.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card intro reveal" id="features">
+          <h2><span class="icon">✨</span>Key Features of nano-PEARL</h2>
+          
+          <img src="./pearl.png" alt="PEARL architecture diagram" class="intro-image">
+          
+          <h3>Draft-Target Disaggregation</h3>
+          <p>The draft and target models are loaded onto separate, dedicated device groups. This fundamental design choice eliminates resource contention for VRAM and compute. It also allows for independent configuration, such as assigning a different tensor-parallel (TP) size to the large target model (e.g., TP=2) and the small draft model (e.g., TP=1), optimizing resource usage across all available GPUs.</p>
+
+          <h3>Parallel Inference</h3>
+          <p>Both the draft model and the target model run inference concurrently. The target model performs "on-the-fly" verification of the tokens being generated by the draft model. This parallel execution minimizes serial dependency, keeps all assigned GPUs highly utilized, and ensures the system is always making forward progress rather than waiting for a long draft to complete before verification.</p>
+
+          <h3>Adaptive Draft Length</h3>
+          <p>nano-PEARL supports adaptive lookahead (gamma) to dynamically balance speculation length and acceptance rates. When alignment between the models is good, the draft model is allowed to generate a longer sequence of tokens without interruption. When alignment is poor (i.e., a mismatch is detected), the target model immediately halts the draft model, preventing it from generating "trash tokens" and wasting valuable compute cycles.</p>
+
+          <h3>Auto-Set Hyper-parameters</h3>
+          <p>To simplify deployment and tuning, the engine can automatically configure optimal operational parameters based on your specific hardware setup. This lowers the barrier to entry, allowing researchers and practitioners to achieve high performance out-of-the-box without extensive manual profiling and configuration.</p>
+
+          <h3>High Performance</h3>
+          <p>nano-PEARL is built directly on top of a production-grade inference stack. It natively integrates state-of-the-art acceleration kernels and techniques, including CUDA Graphs, Paged Attention, and Flash Attention. Users do not have to trade system performance for an advanced decoding algorithm—they get both simultaneously.</p>
+
+          <h3>Memory Efficient</h3>
+          <p>By leveraging Prefix KV Caching, nano-PEARL efficiently reuses the KV cache of shared prefixes between requests. This significantly reduces the memory footprint and redundant computation, enabling higher batch sizes, support for longer context lengths, and overall improved system throughput.</p>
+        </div>
+        
+        <div class="card intro reveal" id="perf">
+          <h2><span class="icon">📊</span>Experiments & Results</h2>
+          <p>Our evaluations demonstrate nano-PEARL's strength in practical, high-batch scenarios, moving beyond idealized `bs=1` metrics. The charts below contrast performance at `bs=32` (a realistic production load) with `bs=1` (a common academic baseline) on NVIDIA H200 hardware.</p>
+
+          <div class="image-grid">
+            <figure>
+              <img src="./benchmark_example.png" alt="nano-PEARL benchmark results at batch size 32" class="intro-image">
+              <figcaption style="text-align: center; font-size: 0.9em; color: var(--muted);"><strong>Fig 1:</strong> Performance at Batch Size 32 (HumanEval)</figcaption>
+            </figure>
+            <figure>
+              <img src="./benchmark_bs1.jpg" alt="nano-PEARL benchmark results at batch size 1" class="intro-image">
+              <figcaption style="text-align: center; font-size: 0.9em; color: var(--muted);"><strong>Fig 2:</strong> Performance at Batch Size 1 (GSM8K)</figcaption>
+            </figure>
+          </div>
+
+          <h3 style="margin-top: 24px;">Beyond `bs=1`</h3>
+          In the `bs=1` scenario (Fig 2), nano-PEARL achieves massive relative speedups—up to <strong>6.27x</strong> for Llama-3.1-70B. And for `bs=32`, Fig 1 highlight the most critical advantage for production. While standard AR decoding gains some throughput from batching (1,159.17 tok/s), it still faces a fundamental ceiling. nano-PEARL's parallel architecture shatters this ceiling by unlocking the true potential of batched inference. By running the draft and target models concurrently, it achieves a massive <strong>3,546.72 tok/s (3.06x)</strong> on the Llama-3.1-70B pair.</p>
+          <p>This demonstrates nano-PEARL's core design goal: it successfully overcomes the limitations of "toy demos" and delivers substantial, practical throughput gains under the high-batch, high-concurrency loads required by real-world services.</p>
+          
+          <p style="margin-top:16px;">For more results and comparisons on different hardware (like L40S) and datasets, please see the <a href="benchmark.html"><strong>Benchmarks page</strong></a>.</p>
+        </div>
+
+        <div class="card intro reveal" id="news">
+          <h2><span class="icon">🎉</span>Latest News</h2>
+          <ul>
+            <li>[2025.11] We release more benchmark results of nano-PEARL on NVIDIA L40S!</li>
+            <li>[2025.11] Our web page of nano-PEARL is established!</li>
+            <li>[2025.10] We release the source code of nano-PEARL. Any PR is warmly welcomed!</li>
+            <li><strong>Paper Collection</strong>: We are seeking papers that follow the parallel speculative decoding paradigm! We are preparing a collection for more comprehensive understanding.</li>
+            <li><strong>Coming Soon</strong>: More updates and features are in development!</li>
+          </ul>
+        </div>
+
+        <div class="grid-2-col">
+          <div class="card intro reveal" id="links">
+            <h2><span class="icon">🚀</span>Get Started</h2>
+            <p>nano-PEARL is built on nano-vLLM and shares a similar API, making it easy to adopt. Get started with installation and examples:</p>
+            <ul>
+              <li><a href="./quickstart.html">Quick Start</a> — Install and run.</li>
+              <li><a href="./benchmark.html">Benchmarks</a> — See performance tables.</li>
+              <li><a href="./faqs.html">FAQs</a> — Troubleshooting (OOM/compat).</li>
+              <li><a href="https://github.com/smart-lty/nano-PEARL" target="_blank" rel="noreferrer">GitHub</a> — Star, issues, and PRs.</li>
+            </ul>
+          </div>
+
+          <div class="card intro reveal" id="roadmap">
+            <h2><span class="icon">📋</span>Roadmap</h2>
+            <p>We welcome community proposals to push advanced SD to larger clusters, embrace MoE targets, or integrate training-time tools.</p>
+            <ul>
+              <li><strong>Dynamic TP Size</strong>: Support for dynamic TP sizes (e.g., TP=6/7).</li>
+              <li><strong>Draft Model Temperature</strong>: Support for non-zero temperature.</li>
+              <li><strong>Continuous Batching</strong>: Integration and chunked prefill.</li>
+              <li><strong>Advanced Adaptive Gamma</strong>: Dynamic <code>gamma</code> tuning.</li>
+              <li><strong>PEARL-2</strong>: Support for fine-tuning a PEARL-specific drafter.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card intro reveal" id="ack">
+          <h2><span class="icon">🙏</span>Acknowledgements</h2>
+          <p class="muted">This project is built on the excellent foundations of <a href="https://github.com/GeeeekExplorer/nano-vllm" target="_blank" rel="noreferrer">nano-vllm</a> and inspired by the <a href="https://arxiv.org/abs/2405.0847" target="_blank" rel="noreferrer">PEARL</a> paper. The nano-PEARL logo was designed by Veo 3.</p>
+        </div>
+      </div>
     </main>
     
   <footer class="footer">
