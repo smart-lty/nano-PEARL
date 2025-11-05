@@ -5,6 +5,7 @@ import torch.distributed as dist
 
 from nano_pearl.utils.context import get_context
 from nano_pearl.pearl_config import TPParams
+from nano_pearl.layers.linear import pad_tensor
 
 
 class VocabParallelEmbedding(nn.Module):
@@ -31,6 +32,8 @@ class VocabParallelEmbedding(nn.Module):
         param_data = param.data
         shard_size = param_data.size(0)
         start_idx = self.local_tp_rank * shard_size
+        num_pad = max(0, shard_size - (loaded_weight.size(0) - start_idx))
+        loaded_weight = pad_tensor(loaded_weight, num_pad, 0)
         loaded_weight = loaded_weight.narrow(0, start_idx, shard_size)
         param_data.copy_(loaded_weight)
 
@@ -56,6 +59,7 @@ class ParallelLMHead(VocabParallelEmbedding):
     ):
         assert not bias
         super().__init__(num_embeddings, embedding_dim, tp_params)
+        self.valid_vocab_size = getattr(tp_params, "valid_vocab_size", num_embeddings)
 
     def forward(self, x: torch.Tensor):
         context = get_context(self.tp_params)
@@ -67,4 +71,5 @@ class ParallelLMHead(VocabParallelEmbedding):
             all_logits = [torch.empty_like(logits) for _ in range(self.tp_size)] if self.local_tp_rank == 0 else None
             dist.gather(logits, all_logits, self.tp_params.master_rank, group=self.tp_params.group)
             logits = torch.cat(all_logits, -1) if self.local_tp_rank == 0 else None
+            logits = logits[..., :self.valid_vocab_size] if self.local_tp_rank == 0 else None
         return logits
