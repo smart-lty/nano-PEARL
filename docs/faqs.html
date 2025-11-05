@@ -1,60 +1,841 @@
 <!doctype html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="utf-8"/>
+
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
   <title>FAQs • nano-PEARL</title>
+
   <meta name="color-scheme" content="dark light">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="./styles.css"/>
+
+  <style>
+
+    /* FAQ-specific styling */
+
+    .faq-section { margin-bottom: 48px; }
+
+    .faq-section h2 {
+
+      font-family: 'Poppins', ui-sans-serif;
+
+      margin-bottom: 24px;
+
+      color: var(--text);
+
+      border-bottom: 2px solid var(--line);
+
+      padding-bottom: 12px;
+
+    }
+
+    .faq-item {
+
+      background: #fff;
+
+      border: 1px solid var(--line);
+
+      border-radius: 12px;
+
+      margin-bottom: 16px;
+
+      box-shadow: 0 2px 8px rgba(20,20,19,0.04);
+
+      transition: box-shadow 0.2s ease;
+
+    }
+
+    .faq-item:hover {
+
+      box-shadow: 0 4px 12px rgba(20,20,19,0.08);
+
+    }
+
+    .faq-item details {
+
+      padding: 20px 24px;
+
+    }
+
+    .faq-item summary {
+
+      cursor: pointer;
+
+      font-family: 'Poppins', ui-sans-serif;
+
+      font-weight: 600;
+
+      font-size: 16px;
+
+      color: var(--text);
+
+      list-style: none;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 12px;
+
+    }
+
+    .faq-item summary::-webkit-details-marker { display: none; }
+
+    .faq-item summary::before {
+
+      content: "▸";
+
+      font-size: 14px;
+
+      color: var(--accent-2);
+
+      transition: transform 0.2s ease;
+
+      flex-shrink: 0;
+
+    }
+
+    .faq-item details[open] summary::before {
+
+      transform: rotate(90deg);
+
+    }
+
+    .faq-answer {
+
+      margin-top: 16px;
+
+      padding-top: 16px;
+
+      border-top: 1px solid var(--line);
+
+      color: var(--text);
+
+      line-height: 1.7;
+
+    }
+
+    .faq-answer p { margin: 0 0 12px; }
+
+    .faq-answer ul, .faq-answer ol {
+
+      margin: 12px 0;
+
+      padding-left: 24px;
+
+    }
+
+    .faq-answer li { margin: 8px 0; }
+
+    .faq-answer code {
+
+      background: #f5f5f5;
+
+      padding: 2px 6px;
+
+      border-radius: 4px;
+
+      font-family: ui-monospace, monospace;
+
+      font-size: 14px;
+
+      color: var(--accent-2);
+
+      font-weight: 600;
+
+    }
+
+    .faq-answer pre {
+
+      background: #f5f5f5;
+
+      border: 1px solid #e5e5e5;
+
+      border-left: 3px solid var(--accent-2);
+
+      border-radius: 8px;
+
+      padding: 12px 16px;
+
+      overflow-x: auto;
+
+      margin: 12px 0;
+
+    }
+
+    .faq-answer pre code {
+
+      background: none;
+
+      padding: 0;
+
+      color: #1f2937;
+
+      font-weight: normal;
+
+    }
+
+    .callout {
+
+      display: flex;
+
+      gap: 10px;
+
+      padding: 12px 16px;
+
+      border-radius: 10px;
+
+      margin: 12px 0;
+
+      border: 1px solid;
+
+    }
+
+    .callout.info {
+
+      border-color: rgba(106,155,204,.35);
+
+      background: rgba(106,155,204,.06);
+
+    }
+
+    .callout.warn {
+
+      border-color: rgba(217,119,87,.35);
+
+      background: rgba(217,119,87,.06);
+
+    }
+
+    .callout .icon {
+
+      flex-shrink: 0;
+
+      font-size: 18px;
+
+    }
+
+    .tag {
+
+      display: inline-block;
+
+      padding: 4px 10px;
+
+      border-radius: 999px;
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      font-family: 'Poppins', ui-sans-serif;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.08em;
+
+      margin-left: 8px;
+
+    }
+
+    .tag.performance { background: rgba(217,119,87,.12); color: #d97757; }
+
+    .tag.config { background: rgba(106,155,204,.12); color: #6a9bcc; }
+
+    .tag.architecture { background: rgba(111,66,193,.12); color: #6f42c1; }
+
+  </style>
+
 </head>
+
 <body>
-  
+
+ 
+
     <div class="nav">
+
       <div class="nav-inner">
+
         <a class="logo" href="./index.html" aria-label="nano-PEARL Home">
+
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+
             <path d="M4 12c5-9 11-9 16 0" stroke="url(#g1)" stroke-width="2.2" stroke-linecap="round"/>
+
             <path d="M4 12c5 9 11 9 16 0" stroke="url(#g2)" stroke-width="2.2" stroke-linecap="round"/>
+
             <defs>
+
               <linearGradient id="g1" x1="4" x2="20" y1="12" y2="12">
+
                 <stop stop-color="#9AE6B4"/><stop offset="1" stop-color="#8AB4F8"/>
+
               </linearGradient>
+
               <linearGradient id="g2" x1="4" x2="20" y1="12" y2="12">
+
                 <stop stop-color="#8AB4F8"/><stop offset="1" stop-color="#9AE6B4"/>
+
               </linearGradient>
+
             </defs>
+
           </svg>
+
           <span class="sig">nano-PEARL</span>
+
         </a>
+
         <nav class="nav-links" role="navigation" aria-label="Primary">
+
           <a href="./index.html" class="">Introduction</a>
+
           <a href="./quickstart.html" class="">Quick Start</a>
+
           <a href="./benchmark.html" class="">BenchMark</a>
+
           <a href="./faqs.html" class="active">FAQs</a>
+
         </nav>
+
       </div>
+
     </div>
-    
-  
+
+ 
+
+ 
+
     <section class="page-hero">
+
       <div class="container" style="padding:42px 24px 28px">
+
         <div class="kicker">Support</div>
+
         <h1>FAQs</h1>
-        <p class="sub">Answers to common questions.</p>
+
+        <p class="sub">Answers to common questions about nano-PEARL.</p>
+
       </div>
+
     </section>
+
+ 
+
     <main class="container">
-      <div class="card notice">Coming Soon!</div>
+
+ 
+
+      <!-- Performance & Configuration Section -->
+
+      <div class="faq-section">
+
+        <h2>⚡ Performance & Configuration</h2>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              Why do I see different token counts when testing the same dataset?
+
+              <span class="tag performance">Performance</span>
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p><strong>Short answer:</strong> This is expected behavior in PEARL benchmarking.</p>
+
+ 
+
+              <p><strong>Detailed explanation:</strong></p>
+
+              <p>For PEARL benchmarking, we run a <strong>fixed number of steps</strong> rather than a fixed token output. This design choice ensures that PEARL maintains a consistent batch size throughout the entire execution.</p>
+
+ 
+
+              <div class="callout info">
+
+                <span class="icon">ℹ️</span>
+
+                <div>
+
+                  <strong>Why this matters:</strong> If we used fixed token output, early request completions would reduce the batch size, which would negatively impact throughput measurements. Running fixed steps prevents this issue and gives more accurate performance metrics.
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </details>
+
+        </div>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              Getting assertion errors at batch-size=32 on CNN/DM datasets?
+
+              <span class="tag config">Config</span>
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p><strong>Solution:</strong> Increase the <code>max_num_batched_tokens</code> parameter in your configuration.</p>
+
+ 
+
+              <p><strong>Steps to fix:</strong></p>
+
+              <ol>
+
+                <li>Open <code>pearl_config.py</code></li>
+
+                <li>Set <code>max_num_batched_tokens = 65536</code></li>
+
+                <li>Restart your benchmark</li>
+
+              </ol>
+
+ 
+
+              <pre><code># In pearl_config.py
+
+config = PEARLConfig(
+
+    draft_model_path="...",
+
+    target_model_path="...",
+
+    max_num_batched_tokens=65536,  # Increase this value
+
+    ...
+
+)</code></pre>
+
+            </div>
+
+          </details>
+
+        </div>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              Why is my speedup only 0.95x at batch-size=32 while smaller batches show 1.36x-2.8x?
+
+              <span class="tag performance">Performance</span>
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p><strong>Root cause:</strong> This is typically due to compute-bound limitations at higher batch sizes, especially on certain GPU architectures like H20.</p>
+
+ 
+
+              <p><strong>Recommended solutions:</strong></p>
+
+              <ul>
+
+                <li><strong>Use larger draft models:</strong> Switch from 1.5B to 3B-8B parameter draft models</li>
+
+                <li><strong>Reduce gamma values:</strong> Larger draft models typically produce better quality drafts, reducing the gamma overhead</li>
+
+                <li><strong>Improve acceptance rates:</strong> Better draft models lead to higher acceptance rates and better overall throughput</li>
+
+              </ul>
+
+ 
+
+              <div class="callout warn">
+
+                <span class="icon">⚠️</span>
+
+                <div>
+
+                  <strong>Hardware consideration:</strong> Some GPUs become compute-bound at higher batch sizes. If you consistently see degraded performance, consider adjusting your batch size or upgrading to GPUs with higher compute capacity.
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </details>
+
+        </div>
+
+      </div>
+
+ 
+
+      <!-- Terminology & Metrics Section -->
+
+      <div class="faq-section">
+
+        <h2>📊 Terminology & Metrics</h2>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              What does "AR" mean in the benchmark results?
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p><strong>AR</strong> stands for <strong>Auto-Regressive decoding</strong>.</p>
+
+ 
+
+              <p>In the context of nano-PEARL benchmarks, AR is used as a comparison baseline to calculate PEARL's speedup ratio. It represents the standard sequential token generation approach where each token is generated one after another, without speculation.</p>
+
+ 
+
+              <p>The speedup ratio is calculated as: <code>Speedup = PEARL_throughput / AR_throughput</code></p>
+
+            </div>
+
+          </details>
+
+        </div>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              What is the MAT metric?
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p><strong>MAT</strong> stands for <strong>Mean Accept Tokens</strong>.</p>
+
+ 
+
+              <p>This metric originates from the original PEARL paper and indicates the equivalent vanilla speculative decoding performance. It measures the average number of tokens accepted per speculation round.</p>
+
+ 
+
+              <ul>
+
+                <li><strong>Higher MAT:</strong> Better alignment between draft and target models</li>
+
+                <li><strong>Lower MAT:</strong> More rejections, indicating poor draft quality</li>
+
+              </ul>
+
+ 
+
+              <p>MAT is a key indicator of how well your draft model is performing and whether your speculation strategy is effective.</p>
+
+            </div>
+
+          </details>
+
+        </div>
+
+      </div>
+
+ 
+
+      <!-- Architecture & Design Section -->
+
+      <div class="faq-section">
+
+        <h2>🏗️ Architecture & Design</h2>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              Can DT Disaggregation and Parallel Inference work independently?
+
+              <span class="tag architecture">Architecture</span>
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p><strong>No, they are the core of PEARL and cannot operate independently.</strong></p>
+
+ 
+
+              <p><strong>Why they're interdependent:</strong></p>
+
+              <p>PEARL's architecture fundamentally relies on overlapping draft model computation with target model verification through "pre-verify" and "post-verify" mechanisms. These features work together to:</p>
+
+ 
+
+              <ul>
+
+                <li>Reduce draft model runtime overhead</li>
+
+                <li>Maintain throughput at larger batch sizes</li>
+
+                <li>Enable adaptive draft length adjustments</li>
+
+              </ul>
+
+ 
+
+              <div class="callout info">
+
+                <span class="icon">💡</span>
+
+                <div>
+
+                  <strong>Design insight:</strong> The "DT disaggregation" functions as a parallel implementation mechanism. The adaptive draft length naturally emerges from the combined effects of pre-verify and post-verify operations.
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </details>
+
+        </div>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              What are the "pre-verify" and "post-verify" mechanisms?
+
+              <span class="tag architecture">Architecture</span>
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p>These are PEARL's core coordination mechanisms between the draft and target models:</p>
+
+ 
+
+              <ul>
+
+                <li>
+
+                  <strong>Pre-verify:</strong> The target model can interrupt the draft model when alignment is poor, preventing the generation of low-quality draft tokens
+
+                </li>
+
+                <li>
+
+                  <strong>Post-verify:</strong> When alignment is good, the draft model continues generating without interruption, maximizing speculation efficiency
+
+                </li>
+
+              </ul>
+
+ 
+
+              <p><strong>Combined effect:</strong> This creates the adaptive draft length feature - automatically adjusting how many tokens to speculate based on real-time alignment quality.</p>
+
+            </div>
+
+          </details>
+
+        </div>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              Where can I find detailed ablation studies?
+
+              <span class="tag architecture">Architecture</span>
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p><strong>Primary source:</strong> The original PEARL paper contains comprehensive ablation studies.</p>
+
+ 
+
+              <p>📄 <strong>Paper reference:</strong> <a href="https://arxiv.org/abs/2408.11850" target="_blank">PEARL: Parallel Speculative Decoding with Adaptive Draft Length</a></p>
+
+ 
+
+              <p><strong>Why nano-PEARL focuses on high batch sizes:</strong></p>
+
+              <p>The nano-PEARL implementation was specifically motivated by the lack of high batch-size evaluation in baseline approaches. Our focus is on demonstrating PEARL's advantages at scale (batch_size=32 and above) where traditional methods struggle.</p>
+
+            </div>
+
+          </details>
+
+        </div>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              How can I compare with vanilla Speculative Decoding?
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p><strong>Recommended approach:</strong> Use the external nano-vllm-spec repository for vanilla SpS benchmarking.</p>
+
+ 
+
+              <p>🔗 <strong>Repository:</strong> <a href="https://github.com/limei1221/nano-vllm-speculative-decoding" target="_blank">nano-vllm-spec</a></p>
+
+ 
+
+              <div class="callout info">
+
+                <span class="icon">ℹ️</span>
+
+                <div>
+
+                  <strong>Note:</strong> nano-PEARL does not implement traditional Speculative Sampling (SpS) as it uses a fundamentally different parallel architecture. For apples-to-apples comparison with vanilla methods, please use the dedicated nano-vllm-spec implementation.
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </details>
+
+        </div>
+
+      </div>
+
+ 
+
+      <!-- Additional Resources Section -->
+
+      <div class="faq-section">
+
+        <h2>📚 Additional Resources</h2>
+
+ 
+
+        <div class="faq-item">
+
+          <details>
+
+            <summary>
+
+              I have more questions. Where can I get help?
+
+            </summary>
+
+            <div class="faq-answer">
+
+              <p><strong>Community support:</strong></p>
+
+              <ul>
+
+                <li>🐛 <strong>Open an issue:</strong> <a href="https://github.com/smart-lty/nano-PEARL/issues" target="_blank">GitHub Issues</a></li>
+
+                <li>💬 <strong>Join discussions:</strong> <a href="https://github.com/smart-lty/nano-PEARL/discussions" target="_blank">GitHub Discussions</a></li>
+
+                <li>📖 <strong>Read the paper:</strong> <a href="https://arxiv.org/abs/2408.11850" target="_blank">PEARL on arXiv</a></li>
+
+              </ul>
+
+ 
+
+              <p>When reporting issues, please include:</p>
+
+              <ol>
+
+                <li>Your hardware configuration (GPU model, number of GPUs)</li>
+
+                <li>Model sizes (draft and target)</li>
+
+                <li>Batch size and other relevant parameters</li>
+
+                <li>Error messages or unexpected behavior description</li>
+
+              </ol>
+
+            </div>
+
+          </details>
+
+        </div>
+
+      </div>
+
+ 
+
     </main>
-    
+
+ 
+
   <footer class="footer">
+
     <div class="container">
+
       nano-PEARL • © 2025
+
     </div>
+
   </footer>
+
   <script src="./site.js"></script>
+
 </body>
+
 </html>
