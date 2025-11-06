@@ -14,6 +14,7 @@ class TPParams:
     master_rank: int
     is_draft: bool
     tp_size: int
+    valid_vocab_size: int
 
 
 class BaseConfig:
@@ -33,6 +34,37 @@ class BaseConfig:
         logger.info(f"Vocab_Size={self.hf_config.vocab_size}")
         logger.info(f"Eos={self.eos}")
 
+        # Dynamic TP: Padding Parameters
+        if self.tensor_parallel_size not in [1, 2, 4, 8]:
+            logger.warning(
+                f"Currently, non-2-power TP is a developing feature, and you may encounter some unexpected errors."
+            )
+            num_heads = self.hf_config.num_attention_heads
+            num_kv_heads = self.hf_config.num_key_value_heads
+            intermediate_size = self.hf_config.intermediate_size
+            vocab_size = self.hf_config.vocab_size
+            tp = self.tensor_parallel_size
+            
+            from math import ceil
+            
+            gqa_ratio = num_heads // num_kv_heads
+            padded_num_kv_heads = ceil(num_kv_heads / tp) * tp
+            padded_num_heads = padded_num_kv_heads * gqa_ratio
+            # Ensure per-rank intermediate shard is Tensor Core friendly (multiple of 128).
+            # Pad total intermediate to a multiple of tp*128 so (intermediate/tp) % 128 == 0.
+            TC_TILE = 128
+            padded_intermediate_size = ceil(intermediate_size / (tp * TC_TILE)) * (tp * TC_TILE)
+            padded_vocab_size = ceil(vocab_size / tp) * tp
+            
+            logger.info(f"Pad num heads from {num_heads} to {padded_num_heads}", color="red")
+            logger.info(f"Pad num kv heads from {num_kv_heads} to {padded_num_kv_heads}", color="red")
+            logger.info(f"Pad intermediate size from {intermediate_size} to {padded_intermediate_size} (per-rank {padded_intermediate_size // tp}, aligned to {TC_TILE})", color="red")
+            logger.info(f"Pad vocab size from {vocab_size} to {padded_vocab_size}", color="red")
+            self.hf_config.num_key_value_heads = padded_num_kv_heads
+            self.hf_config.num_attention_heads = padded_num_heads
+            self.hf_config.intermediate_size = padded_intermediate_size
+            self.hf_config.valid_vocab_size = self.hf_config.vocab_size
+            self.hf_config.vocab_size = padded_vocab_size
 
 @dataclass
 class PEARLConfig:

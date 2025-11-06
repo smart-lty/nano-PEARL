@@ -9,7 +9,11 @@ from nano_pearl.utils.pearl_logger import logger
 
 
 def default_weight_loader(param: nn.Parameter, loaded_weight: torch.Tensor):
-    param.data.copy_(loaded_weight)
+    param_data = param.data
+    param_data.zero_()
+    common_shape = tuple(min(a, b) for a, b in zip(param_data.shape, loaded_weight.shape))
+    slices = tuple(slice(0, dim) for dim in common_shape)
+    param_data[slices].copy_(loaded_weight[slices])
 
 
 def load_model(model: nn.Module, path: str):

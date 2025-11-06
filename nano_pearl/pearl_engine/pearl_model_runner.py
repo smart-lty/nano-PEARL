@@ -72,6 +72,7 @@ class ModelRunnerBase:
             master_rank=self.group_config.master_rank,
             is_draft=self.is_draft,
             tp_size=self.tensor_parallel_size,
+            valid_vocab_size= getattr(self.hf_config, "valid_vocab_size", self.hf_config.vocab_size)
         )
         dist.barrier()
         if self.rank == 0:
