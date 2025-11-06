@@ -50,12 +50,15 @@ class BaseConfig:
             gqa_ratio = num_heads // num_kv_heads
             padded_num_kv_heads = ceil(num_kv_heads / tp) * tp
             padded_num_heads = padded_num_kv_heads * gqa_ratio
-            padded_intermediate_size = ceil(intermediate_size / tp) * tp
+            # Ensure per-rank intermediate shard is Tensor Core friendly (multiple of 128).
+            # Pad total intermediate to a multiple of tp*128 so (intermediate/tp) % 128 == 0.
+            TC_TILE = 128
+            padded_intermediate_size = ceil(intermediate_size / (tp * TC_TILE)) * (tp * TC_TILE)
             padded_vocab_size = ceil(vocab_size / tp) * tp
             
             logger.info(f"Pad num heads from {num_heads} to {padded_num_heads}", color="red")
             logger.info(f"Pad num kv heads from {num_kv_heads} to {padded_num_kv_heads}", color="red")
-            logger.info(f"Pad intermediate size from {intermediate_size} to {padded_intermediate_size}", color="red")
+            logger.info(f"Pad intermediate size from {intermediate_size} to {padded_intermediate_size} (per-rank {padded_intermediate_size // tp}, aligned to {TC_TILE})", color="red")
             logger.info(f"Pad vocab size from {vocab_size} to {padded_vocab_size}", color="red")
             self.hf_config.num_key_value_heads = padded_num_kv_heads
             self.hf_config.num_attention_heads = padded_num_heads
