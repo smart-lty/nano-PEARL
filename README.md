@@ -24,6 +24,7 @@ nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine that
 🚧 **Coming Soon**: More updates and features are in development!
 
 📚 **Paper Collection**: We are seeking for papers that follows parallel speculative decoding paradigm! We are going to prepare a paper collection of these papers for more comprehensive understanding.
+- [2025.11] 🔥 We Support Non-2-Power TP size to enable better GPU utilization!
 - [2025.11] 🔥 We release more benchmark results of nano-PEARL on NVIDIA L40S!
 - [2025.11] 🔥 Our web page of [nano-PEARL](https://smart-lty.github.io/nano-PEARL/) is established!
 - [2025.10] 🔥 We release the source code of nano-PEARL. Any PR is warmly welcomed!
@@ -36,6 +37,8 @@ nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine that
   - When the alignment is good, the draft model could generate draft tokens without being interrupted by the target model.
   - When the alignment is poor, the target model could prevent the draft model from generating trash draft tokens.
 - 🤖 **Auto-Set Hyper-parameters**: Automatically configure optimal parameters for your hardware setup.
+- ⚙️ **Dynamic TP Size**: We support loading draft / target model with non-2-power TP size (3,6,7). To the best of our knowledge, we are **the first one** implementing this feature for LLM inference!
+> ⚠️ Currently, this is an experimental feature.We implement dynamic TP by padding the parameters, which introduces additional computation and decrease the overall throughput. 
 - 🚀 **High Performance**: Built on CUDA Graphs and tensor parallelism for maximum throughput.
 - 💾 **Memory Efficient**: Prefix KV caching reduces memory usage while maintaining performance.
 
@@ -100,7 +103,7 @@ Feel Free to check more benchmark results at our [benchmark page](https://smart-
 
 ## 📋 TODOs
 
-- [ ]  **Dynamic TP Size**: Support dynamic TP size, including TP=6/7, hence the 8 GPUs can be fully used!
+- [x]  **Dynamic TP Size**: Support dynamic TP size, including TP=6/7, hence the 8 GPUs can be fully used!
 - [ ]  **Draft Model Temperature**: Support setting a non-zero temperature for the draft model.
 - [ ]  **Continuous Batching**: Support continuous batching and chunked prefill.
 - [ ]  **Adaptive Gamma**: Support dynamic `gamma` tuning based on context size and model's performance.
