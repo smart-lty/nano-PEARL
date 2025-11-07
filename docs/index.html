@@ -161,6 +161,46 @@
       border-top: 1px solid var(--line);
       margin-top: 32px;
     }
+    
+    /* Make all links blue with underline, except navigation links */
+    body.intro .wrap a,
+    body.intro .card a {
+      color: #0066cc;
+      text-decoration: underline;
+    }
+    body.intro .wrap a:hover,
+    body.intro .card a:hover {
+      color: #0052a3;
+    }
+    body.intro .wrap a:visited,
+    body.intro .card a:visited {
+      color: #0066cc;
+    }
+    /* Ensure navigation links keep their original style */
+    body.intro .nav a,
+    body.intro .nav-links a {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    /* Highlight styles for key information */
+    body.intro .highlight-performance {
+      color: #0066cc;
+      font-weight: 600;
+    }
+    body.intro .highlight-tech {
+      color: #059669;
+      font-weight: 500;
+    }
+    body.intro .highlight-feature {
+      background: rgba(154, 230, 180, 0.15);
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    body.intro .highlight-number {
+      color: #8B5CF6;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body class="intro">
@@ -194,7 +234,7 @@
   
     <section class="page-hero">
       <div class="container" style="padding:42px 24px 28px">
-        <div class="kicker">A Project</div>
+        <div class="kicker">Project</div>
         <h1>nano-PEARL: Unleashing Batch Throughput</h1>
         <p class="sub">Reimagined Speculative Decoding with Parallelism and Adaptive Draft Length.</p>
       </div>
@@ -209,7 +249,20 @@
           <img src="./nano_pearl.jpg" alt="nano-PEARL logo and overview diagram" class="intro-image" style="max-width: 600px;">
           
           <p>Speculative decoding (SD) is a powerful technique for accelerating Large Language Model (LLM) inference. We are excited to introduce <strong>nano-PEARL</strong>, a single-node, multi-GPU parallel speculative decoding engine built for practical, high-throughput deployment and fast research iteration.</p>
-          <p>nano-PEARL's core design revolves around <strong>Draft-Target Disaggregation (DT)</strong>: it separates Draft and Target models onto dedicated device groups and runs them concurrently. By integrating production-grade accelerators—Prefix KV Cache, Paged/Flash Attention, CUDA Graphs, and Tensor Parallelism—it delivers exceptional throughput under heavy batch workloads without sacrificing output fidelity.</p>
+          <p>nano-PEARL's core design revolves around <strong class="highlight-tech">Draft-Target Disaggregation (DT)</strong>: it separates Draft and Target models onto dedicated device groups and runs them concurrently. By integrating production-grade accelerators—<span class="highlight-feature">Prefix KV Cache</span>, <span class="highlight-feature">Paged/Flash Attention</span>, <span class="highlight-feature">CUDA Graphs</span>, and <span class="highlight-feature">Tensor Parallelism</span>—it delivers exceptional throughput under heavy batch workloads without sacrificing output fidelity.</p>
+        </div>
+
+        <div class="card intro reveal" id="news">
+          <h2><span class="icon">🎉</span>Latest News</h2>
+          <ul>
+            <li>[2025.11] 🔥 We release some comparisons between EAGLE-3 and nano-PEARL! Check them at our <a href="./benchmark.html">benchmark page</a>.</li>
+            <li>[2025.11] 🔥 We Support Non-2-Power TP size to enable better GPU utilization!</li>
+            <li>[2025.11] We release more benchmark results of nano-PEARL on NVIDIA L40S!</li>
+            <li>[2025.11] Our web page of nano-PEARL is established!</li>
+            <li>[2025.10] We release the source code of nano-PEARL. Any PR is warmly welcomed!</li>
+            <li><strong>Paper Collection</strong>: We are seeking papers that follow the parallel speculative decoding paradigm! We are preparing a collection for more comprehensive understanding.</li>
+            <li><strong>Coming Soon</strong>: More updates and features are in development!</li>
+          </ul>
         </div>
 
         <div class="card intro reveal" id="why">
@@ -219,10 +272,10 @@
           <div class="callout info" style="margin-top: 20px;">
             <h3>Key Capabilities of nano-PEARL</h3>
             <ul>
-              <li><strong>High-Throughput Batch Inference:</strong> Engineered to excel at large batch sizes (`bs=32`+) and long contexts, not just `bs=1` demos.</li>
-              <li><strong>Native System Integration:</strong> Coexists perfectly with modern inference accelerators like Paged Attention, Flash Attention, and CUDA Graphs.</li>
-              <li><strong>Scalable Parallelism:</strong> Leverages Draft-Target Disaggregation and Tensor Parallelism to efficiently scale across multiple GPUs on a single node.</li>
-              <li><strong>Resource-Efficient:</strong> Avoids resource contention and optimizes VRAM usage through Prefix KV Caching and independent model device placement.</li>
+              <li><strong>High-Throughput Batch Inference:</strong> Engineered to excel at large batch sizes (<code class="highlight-number">bs=32+</code>) and long contexts, not just <code class="highlight-number">bs=1</code> demos.</li>
+              <li><strong>Native System Integration:</strong> Coexists perfectly with modern inference accelerators like <span class="highlight-feature">Paged Attention</span>, <span class="highlight-feature">Flash Attention</span>, and <span class="highlight-feature">CUDA Graphs</span>.</li>
+              <li><strong>Scalable Parallelism:</strong> Leverages <span class="highlight-tech">Draft-Target Disaggregation</span> and <span class="highlight-feature">Tensor Parallelism</span> to efficiently scale across multiple GPUs on a single node.</li>
+              <li><strong>Resource-Efficient:</strong> Avoids resource contention and optimizes VRAM usage through <span class="highlight-feature">Prefix KV Caching</span> and independent model device placement.</li>
             </ul>
           </div>
         </div>
@@ -233,28 +286,28 @@
           <img src="./pearl.png" alt="PEARL architecture diagram" class="intro-image">
           
           <h3>Draft-Target Disaggregation</h3>
-          <p>The draft and target models are loaded onto separate, dedicated device groups. This fundamental design choice eliminates resource contention for VRAM and compute. It also allows for independent configuration, such as assigning a different tensor-parallel (TP) size to the large target model (e.g., TP=2) and the small draft model (e.g., TP=1), optimizing resource usage across all available GPUs.</p>
+          <p>The draft and target models are loaded onto separate, dedicated device groups. This fundamental design choice eliminates resource contention for VRAM and compute. It also allows for independent configuration, such as assigning a different tensor-parallel (TP) size to the large target model (e.g., <code class="highlight-number">TP=2</code>) and the small draft model (e.g., <code class="highlight-number">TP=1</code>), optimizing resource usage across all available GPUs.</p>
 
           <h3>Parallel Inference</h3>
-          <p>Both the draft model and the target model run inference concurrently. The target model performs "on-the-fly" verification of the tokens being generated by the draft model. This parallel execution minimizes serial dependency, keeps all assigned GPUs highly utilized, and ensures the system is always making forward progress rather than waiting for a long draft to complete before verification.</p>
+          <p>Both the draft model and the target model run inference <span class="highlight-tech">concurrently</span>. The target model performs <span class="highlight-tech">"on-the-fly" verification</span> of the tokens being generated by the draft model. This parallel execution minimizes serial dependency, keeps all assigned GPUs highly utilized, and ensures the system is always making forward progress rather than waiting for a long draft to complete before verification.</p>
            <h3>Dynamic TP Size:</h3>
-          <p>We support loading draft / target model with non-2-power TP size (3,6,7). To the best of our knowledge, we are the first one implementing this feature for LLM inference! ⚠️Currently, this is an experimental feature. We implement dynamic TP by padding the parameters, which introduces additional computation and decreases the overall throughput.</p>
+          <p>We support loading draft / target model with non-2-power TP size (<code class="highlight-number">3,6,7</code>). <span class="highlight-performance">To the best of our knowledge, we are the first one implementing this feature for LLM inference!</span> <br> ⚠️<span style="color: red;">Currently, this is an experimental feature. We implement dynamic TP by padding the parameters, which introduces additional computation and decreases the overall throughput.</span></p>
           <h3>Adaptive Draft Length</h3>
-          <p>nano-PEARL supports adaptive lookahead (gamma) to dynamically balance speculation length and acceptance rates. When alignment between the models is good, the draft model is allowed to generate a longer sequence of tokens without interruption. When alignment is poor (i.e., a mismatch is detected), the target model immediately halts the draft model, preventing it from generating "trash tokens" and wasting valuable compute cycles.</p>
+          <p>nano-PEARL supports <span class="highlight-tech">adaptive lookahead (gamma)</span> to dynamically balance speculation length and acceptance rates. When alignment between the models is good, the draft model is allowed to generate a longer sequence of tokens without interruption. When alignment is poor (i.e., a mismatch is detected), the target model immediately halts the draft model, preventing it from generating "trash tokens" and wasting valuable compute cycles.</p>
 
           <h3>Auto-Set Hyper-parameters</h3>
           <p>To simplify deployment and tuning, the engine can automatically configure optimal operational parameters based on your specific hardware setup. This lowers the barrier to entry, allowing researchers and practitioners to achieve high performance out-of-the-box without extensive manual profiling and configuration.</p>
 
           <h3>High Performance</h3>
-          <p>nano-PEARL is built directly on top of a production-grade inference stack. It natively integrates state-of-the-art acceleration kernels and techniques, including CUDA Graphs, Paged Attention, and Flash Attention. Users do not have to trade system performance for an advanced decoding algorithm—they get both simultaneously.</p>
+          <p>nano-PEARL is built directly on top of a production-grade inference stack. It natively integrates state-of-the-art acceleration kernels and techniques, including <span class="highlight-feature">CUDA Graphs</span>, <span class="highlight-feature">Paged Attention</span>, and <span class="highlight-feature">Flash Attention</span>. Users do not have to trade system performance for an advanced decoding algorithm—they get both simultaneously.</p>
 
           <h3>Memory Efficient</h3>
-          <p>By leveraging Prefix KV Caching, nano-PEARL efficiently reuses the KV cache of shared prefixes between requests. This significantly reduces the memory footprint and redundant computation, enabling higher batch sizes, support for longer context lengths, and overall improved system throughput.</p>
+          <p>By leveraging <span class="highlight-feature">Prefix KV Caching</span>, nano-PEARL efficiently reuses the KV cache of shared prefixes between requests. This significantly reduces the memory footprint and redundant computation, enabling higher batch sizes, support for longer context lengths, and overall improved system throughput.</p>
         </div>
         
         <div class="card intro reveal" id="perf">
           <h2><span class="icon">📊</span>Experiments & Results</h2>
-          <p>Our evaluations demonstrate nano-PEARL's strength in practical, high-batch scenarios, moving beyond idealized `bs=1` metrics. The charts below contrast performance at `bs=32` (a realistic production load) with `bs=1` (a common academic baseline) on NVIDIA H200 hardware.</p>
+          <p>Our evaluations demonstrate nano-PEARL's strength in practical, high-batch scenarios, moving beyond idealized <code class="highlight-number">bs=1</code> metrics. The charts below contrast performance at <code class="highlight-number">bs=32</code> (a realistic production load) with <code class="highlight-number">bs=1</code> (a common academic baseline) on NVIDIA H200 hardware.</p>
 
           <div class="image-grid">
             <figure>
@@ -268,21 +321,10 @@
           </div>
 
           <h3 style="margin-top: 24px;">Beyond `bs=1`</h3>
-          In the `bs=1` scenario (Fig 2), nano-PEARL achieves massive relative speedups—up to <strong>6.27x</strong> for Llama-3.1-70B. And for `bs=32`, Fig 1 highlight the most critical advantage for production. While standard AR decoding gains some throughput from batching (1,159.17 tok/s), it still faces a fundamental ceiling. nano-PEARL's parallel architecture shatters this ceiling by unlocking the true potential of batched inference. By running the draft and target models concurrently, it achieves a massive <strong>3,546.72 tok/s (3.06x)</strong> on the Llama-3.1-70B pair.</p>
+          <p>In the <code class="highlight-number">bs=1</code> scenario (Fig 2), nano-PEARL achieves massive relative speedups—up to <strong class="highlight-performance">6.27x</strong> for Llama-3.1-70B. And for <code class="highlight-number">bs=32</code>, Fig 1 highlight the most critical advantage for production. While standard AR decoding gains some throughput from batching (<span class="highlight-performance">1,159.17 tok/s</span>), it still faces a fundamental ceiling. nano-PEARL's parallel architecture shatters this ceiling by unlocking the true potential of batched inference. By running the draft and target models concurrently, it achieves a massive <strong class="highlight-performance">3,546.72 tok/s (3.06x)</strong> on the Llama-3.1-70B pair.</p>
           <p>This demonstrates nano-PEARL's core design goal: it successfully overcomes the limitations of "toy demos" and delivers substantial, practical throughput gains under the high-batch, high-concurrency loads required by real-world services.</p>
           
           <p style="margin-top:16px;">For more results and comparisons on different hardware (like L40S) and datasets, please see the <a href="benchmark.html"><strong>Benchmarks page</strong></a>.</p>
-        </div>
-
-        <div class="card intro reveal" id="news">
-          <h2><span class="icon">🎉</span>Latest News</h2>
-          <ul>
-            <li>[2025.11] We release more benchmark results of nano-PEARL on NVIDIA L40S!</li>
-            <li>[2025.11] Our web page of nano-PEARL is established!</li>
-            <li>[2025.10] We release the source code of nano-PEARL. Any PR is warmly welcomed!</li>
-            <li><strong>Paper Collection</strong>: We are seeking papers that follow the parallel speculative decoding paradigm! We are preparing a collection for more comprehensive understanding.</li>
-            <li><strong>Coming Soon</strong>: More updates and features are in development!</li>
-          </ul>
         </div>
 
         <div class="grid-2-col">

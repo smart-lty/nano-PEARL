@@ -325,6 +325,11 @@ thead th:first-child, tbody td:first-child, tbody th:first-child{position:sticky
   background:var(--ar-label-bg);
   border-color:var(--ar-label-border);
 }
+.mode-chip.eagle3{
+  color:#a63d2e;
+  background:#ffe5e0;
+  border-color:#f5a99e;
+}
 .mode-chip.pearl{
   color:var(--pearl-label-text);
   background:var(--pearl-label-bg);

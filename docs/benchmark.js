@@ -14,11 +14,17 @@ function parseMarkdownTable(md){
   for (let i=0; i<lines.length; i++){
     if(lines[i].trim().startsWith("|")){ start = i; break; }
   }
-  if(start === -1) return {headers:[], rows:[]};
+  if(start === -1){
+    console.warn("[parseMarkdownTable] No table found in markdown");
+    return {headers:[], rows:[]};
+  }
   end = start;
   while(end < lines.length && lines[end].trim().startsWith("|")) end++;
   const tableLines = lines.slice(start, end).map(l => l.trim()).filter(Boolean);
-  if(tableLines.length < 3) return {headers:[], rows:[]};
+  if(tableLines.length < 3){
+    console.warn("[parseMarkdownTable] Table too short:", tableLines.length);
+    return {headers:[], rows:[]};
+  }
   const headers = tableLines[0].slice(1, -1).split("|").map(s => s.trim());
   const rowLines = tableLines.slice(2);
   const rows = rowLines.map(line => {
@@ -27,6 +33,7 @@ function parseMarkdownTable(md){
     headers.forEach((h, idx) => { obj[h] = cells[idx]; });
     return obj;
   });
+  console.log("[parseMarkdownTable] Parsed", rows.length, "rows with headers:", headers);
   return {headers, rows};
 }
 
@@ -37,6 +44,74 @@ function fmt(n){
   return Number(n).toLocaleString(undefined, {maximumFractionDigits: 2});
 }
 
+
+
+// ===== EAGLE3 Speedup (dataset, BS -> {mat, ar, speedup}) =====
+async function loadEagle3Speedups(url){
+  try{
+    const resp = await fetch(url, {cache:'no-store'});
+    if(!resp.ok) throw new Error('EAGLE3 not found: '+resp.status);
+    const md = await resp.text();
+    return parseEagle3SpeedupTable(md);
+  }catch(err){
+    console.warn('[EAGLE3] load failed:', err);
+    return null;
+  }
+}
+
+function parseEagle3SpeedupTable(md){
+  const lines = md.split(/\r?\n/);
+  // find speedup section header in zh/en
+  let i = lines.findIndex(l => /^##s*(?:加速比|Speedup)/i.test(l));
+  if(i === -1) i = 0;
+  // collect first table block after header
+  const tbl = [];
+  for(let j=i+1; j<lines.length; j++){
+    const t = lines[j].trim();
+    if(!t) continue;
+    if(t.startsWith('|')) tbl.push(t); else if(tbl.length) break;
+  }
+  if(tbl.length < 3) return null;
+  const headers = tbl[0].slice(1, -1).split('|').map(s=>s.trim());
+  const h = (name)=> headers.findIndex(x => x.toLowerCase() === name.toLowerCase());
+  const idxDataset = h('Dataset');
+  const idxBS = h('BS');
+  // columns may be named 'EAGLE3'/'AR' or 'MAT(EAGLE3)' etc.; be flexible
+  const findCol = (...cands) => {
+    const lowers = headers.map(s=>s.toLowerCase());
+    for(const c of cands){
+      const k = lowers.indexOf(c.toLowerCase());
+      if(k!==-1) return k;
+    }
+    return -1;
+  };
+  const idxE3 = findCol('EAGLE3','Throughput(EAGLE3)','E3');
+  const idxAR = findCol('AR','Throughput(AR)');
+  const idxMAT = findCol('MAT','Mat');
+  const idxSpeed = findCol('Speedup','加速比');
+  const rows = tbl.slice(2).map(line => line.slice(1,-1).split('|').map(s=>s.trim()));
+  const map = new Map(); // dataset -> Map(bs -> {mat, ar, speedup})
+  for(const r of rows){
+    const ds = r[idxDataset];
+    const bs = Number(r[idxBS]);
+    if(!ds || !Number.isFinite(bs)) continue;
+    const e3 = Number(String(r[idxE3]||'').replace(/x$/i,''));
+    const ar = Number(String(r[idxAR]||'').replace(/x$/i,''));
+    const mat = Number(String(r[idxMAT]||'').replace(/x$/i,''));
+    const sp = Number(String(r[idxSpeed]||'').replace(/x$/i,''));
+    if(!map.has(ds)) map.set(ds, new Map());
+    map.get(ds).set(bs, {mat, ar, speedup:sp, e3});
+  }
+  return map;
+}
+
+function getEagle3For(ds, bs){
+  const m = state.eagle3Map;
+  if(!m) return null;
+  const sub = m.get(ds);
+  if(!sub) return null;
+  return sub.get(Number(bs)) || null;
+}
 function fmtFixed(n, digits=2){
   if (n === null || n === undefined || isNaN(n)) return "—";
   return Number(n).toLocaleString(undefined, {
@@ -68,8 +143,21 @@ function simplifyModelName(s){
 
 // Build groups per Target: [ AR baseline row, ... PEARL rows ]
 function buildGroups(rows, batchSize, dataset){
-  const filtered = rows.filter(r => String(r["Batch Size"]).trim() === String(batchSize).trim()
-                                 && String(r["Benchmark"]).trim() === String(dataset).trim());
+  console.log("[buildGroups] Filtering", rows.length, "rows for batch", batchSize, "dataset", dataset);
+  const filtered = rows.filter(r => {
+    const rBatch = String(r["Batch Size"] || "").trim();
+    const rDataset = String(r["Benchmark"] || "").trim();
+    const match = rBatch === String(batchSize).trim() && rDataset === String(dataset).trim();
+    return match;
+  });
+  console.log("[buildGroups] Found", filtered.length, "matching rows");
+  if(filtered.length === 0 && rows.length > 0){
+    // Debug: show available batch sizes and datasets
+    const availableBatches = [...new Set(rows.map(r => r["Batch Size"]))];
+    const availableDatasets = [...new Set(rows.map(r => r["Benchmark"]))];
+    console.warn("[buildGroups] Available batches:", availableBatches);
+    console.warn("[buildGroups] Available datasets:", availableDatasets);
+  }
   const groups = new Map();
   for(const r of filtered){
     const tgt = r["Target Model"];
@@ -104,6 +192,9 @@ const DATA_SOURCES = {
   L40S: "./bench_summary_l40s.md"
 };
 
+const EAGLE3_SOURCE = './eagle3_report.md';
+
+
 const SETTINGS = {
   H200: { hardware: "NVIDIA H200", targetTP: "2" },
   L40S: { hardware: "NVIDIA L40S", targetTP: "4" }
@@ -117,6 +208,8 @@ const state = {
   flatRows: [],
   chartVisible: false,
   sourceKey: "H200",
+  eagle3Map: null,
+  eagle3LoadedKey: null,
   dataCache: new Map(),
   selections: new Map()
 };
@@ -182,12 +275,15 @@ async function loadDataSource(key){
     throw new Error(`Unknown data source: ${key}`);
   }
   if(state.dataCache.has(key)){
+    console.log("[loadDataSource] Using cached data for", key);
     return state.dataCache.get(key);
   }
+  console.log("[loadDataSource] Loading data from", src);
   const data = await loadMarkdownTable(src);
   if(!data || !data.rows || data.rows.length === 0){
-    throw new Error(`Parsed 0 rows from ${src}`);
+    throw new Error(`Parsed 0 rows from ${src}. Please check the file format.`);
   }
+  console.log("[loadDataSource] Successfully loaded", data.rows.length, "rows");
   state.dataCache.set(key, data);
   return data;
 }
@@ -267,6 +363,16 @@ async function setHardware(key){
   showTableLoading();
   try{
     const data = await loadDataSource(key);
+    // Load EAGLE3 map for H200 only
+    state.eagle3Map = null;
+    state.eagle3LoadedKey = null;
+    if(key === 'H200'){
+      try{
+        const m = await loadEagle3Speedups(EAGLE3_SOURCE);
+        if(m){ state.eagle3Map = m; state.eagle3LoadedKey = 'H200'; }
+      }catch(_){}
+    }
+
     const stored = state.selections.get(key) || {};
     state.sourceKey = key;
     state.data = data;
@@ -324,7 +430,9 @@ function renderTable(groups){
     const ar_mat = g.ar ? Number(g.ar["MAT"]) : NaN;
     const pearlRows = g.pearls || [];
 
-    const rowspan = 1 + pearlRows.length;
+    const targetIsE3 = (tSimple === 'Qwen3-32B');
+    const hasE3 = (state.sourceKey === 'H200') && targetIsE3 && !!getEagle3For(state.dataset, state.batch);
+    const rowspan = 1 + (hasE3 ? 1 : 0) + pearlRows.length;
     // First row: AR baseline
     rowsHTML.push(
       `<tr>
@@ -338,6 +446,32 @@ function renderTable(groups){
         <td class="speedup-col">${fmtFixed(1)}x</td>
       </tr>`
     );
+
+    // Eagle3 row (from SGLang report speedup table)
+    if(hasE3){
+      const e3 = getEagle3For(state.dataset, state.batch);
+      const e3Mat = e3 ? e3.mat : NaN;
+      const e3Spd = e3 ? e3.speedup : NaN;
+      // Set draft model content based on batch size
+      let draftModelText = 'AngelSlim--Qwen3-32B_eagle3';
+      if(state.batch === 1 || state.batch === 8){
+        draftModelText = '(D=5, K=8, N=32)';
+      } else if(state.batch === 16 || state.batch === 32){
+        draftModelText = '(D=3, K=1, N=4)';
+      }
+      rowsHTML.push(
+        `<tr>
+          <td class="col-draft">
+            <span class="mode-chip eagle3">Eagle3</span>
+            <span class="model-name">${draftModelText}</span>
+          </td>
+          <td class="col-throughput">-</td>
+          <td class="col-mat">${fmtFixed(e3Mat)}</td>
+          <td class="speedup-col">${isFinite(e3Spd)? fmtFixed(e3Spd)+'x':'—'}</td>
+        </tr>
+        `
+      );
+    }
 
     // Subsequent rows: PEARL lines
     for(const p of pearlRows){
@@ -614,8 +748,20 @@ const speedupCallouts = {
 };
 
 function render(){
-  if(!state.data || !state.data.rows) return;
+  if(!state.data || !state.data.rows){
+    console.warn("[render] No data available. state.data:", state.data);
+    showTableError(new Error("No data loaded. Please check the data files."));
+    return;
+  }
   const groups = buildGroups(state.data.rows, state.batch, state.dataset);
+  console.log("[render] Built", groups.length, "groups for batch", state.batch, "dataset", state.dataset);
+  if(groups.length === 0){
+    const tbody = document.querySelector("#bench-table tbody");
+    if(tbody){
+      tbody.innerHTML = `<tr><td colspan="5" class="error-cell">No data found for batch size ${state.batch} and dataset ${state.dataset}</td></tr>`;
+    }
+    return;
+  }
   renderTable(groups);
   if(state.chartVisible){
     renderChart();
