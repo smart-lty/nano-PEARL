@@ -401,9 +401,9 @@ class ModelRunnerBase:
         end_time = time.time()
         dist.barrier()
 
-        output = [(seq_id, completion_token_ids, None) for seq_id, completion_token_ids in outputs]
-
-        if self.rank == self.global_config.target_config.master_rank:
+        seqs = self.scheduler.finished
+        output = [(seq.seq_id, seq.completion_token_ids, seq.num_acc_tokens) for seq in seqs]
+        if self.tp_params.local_rank == 0:
             data = pickle.dumps([output, end_time - start_time])
             n = len(data)
             self.shm.buf[0:4] = n.to_bytes(4, "little")
