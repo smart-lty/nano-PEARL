@@ -23,7 +23,8 @@ nano-PEARL is a single-node, multi-GPU parallel speculative decoding engine that
 
 🚧 **Coming Soon**: More updates and features are in development!
 
-📚 **Paper Collection**: We are seeking for papers that follows parallel speculative decoding paradigm! We are going to prepare a paper collection of these papers for more comprehensive understanding.
+📚 **Paper Collection**: We are seeking for papers that follows parallel speculative decoding paradigm! We are going to prepare a [paper collection](https://smart-lty.github.io/nano-PEARL/papers.html) of these papers for more comprehensive understanding.
+- [2026.2] 🔥 We release a curated paper list which explores the spirit of parallel speculative decoding! Check them at [papers](https://smart-lty.github.io/nano-PEARL/papers.html) page.
 - [2025.11] 🔥 We release some comparisons between EAGLE-3 and nano-PEARL! Check them at our [benchmark](https://smart-lty.github.io/nano-PEARL/benchmark.html) page.
 - [2025.11] 🔥 We Support Non-2-Power TP size to enable better GPU utilization!
 - [2025.11] 🔥 We release more benchmark results of nano-PEARL on NVIDIA L40S!

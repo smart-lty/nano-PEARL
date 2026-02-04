@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Papers • nano-PEARL</title>
+  <meta name="color-scheme" content="dark light">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css"/>
+  <style>
+    body.papers .wrap{
+      padding-top: 24px;
+      display:flex;
+      flex-direction:column;
+      gap: 16px;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Toolbar (search + filters) */
+    .papers-toolbar{
+      padding: 16px 18px;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 12px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .papers-toolbar h2{
+      margin: 0;
+      font-family:'Poppins', ui-sans-serif, system-ui;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+    .papers-toolbar .subtitle{
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .toolbar-left{
+      display:flex;
+      flex-direction:column;
+      gap: 2px;
+      min-width: 260px;
+      flex: 1 1 320px;
+    }
+    .toolbar-right{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+      gap: 12px;
+      flex: 2 1 420px;
+    }
+    .search{
+      flex: 1 1 280px;
+      min-width: 240px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background:#fff;
+      box-shadow: 0 4px 10px rgba(20,20,19,0.05);
+      transition: box-shadow .25s ease, border-color .2s ease;
+    }
+    .search:focus-within{
+      border-color: rgba(106,155,204,0.5);
+      box-shadow: 0 0 0 3px rgba(106,155,204,0.14);
+    }
+    .search svg{
+      width: 16px;
+      height: 16px;
+      color: rgba(107,106,100,0.9);
+      flex-shrink:0;
+    }
+    .search input{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      font-family:'Poppins', ui-sans-serif, system-ui;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .search input::placeholder{ color: rgba(107,106,100,0.75); }
+    .btn-clear{
+      border:none;
+      background:transparent;
+      padding: 6px 8px;
+      border-radius: 10px;
+      font-family:'Poppins', ui-sans-serif, system-ui;
+      font-weight:700;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(107,106,100,0.9);
+      cursor:pointer;
+      border:1px solid transparent;
+      transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+    }
+    .btn-clear:hover{
+      background: rgba(20,20,19,0.04);
+      border-color: rgba(20,20,19,0.10);
+      color: var(--text);
+    }
+
+    .statline{
+      font-family:'Poppins', ui-sans-serif, system-ui;
+      font-size: 12px;
+      font-weight:700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .statline a{
+      color: var(--accent-2);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: rgba(106,155,204,0.45);
+    }
+    .statline a:hover{
+      text-decoration-color: rgba(106,155,204,0.85);
+    }
+    .statline .dot{
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(107,106,100,0.55);
+    }
+
+    /* Paper list */
+    .paper-list{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .paper-card{
+      padding: 18px 20px;
+      display:flex;
+      gap: 16px;
+      align-items:flex-start;
+      transition: box-shadow .25s ease, border-color .2s ease, transform .2s ease, background-color .2s ease;
+    }
+    .paper-card:hover{
+      box-shadow: 0 10px 24px rgba(20,20,19,0.10);
+      transform: translateY(-1px);
+      border-color: rgba(107,106,100,0.35);
+      background: rgba(20,20,19,0.01);
+    }
+    .paper-card.is-origin{
+      border-color: rgba(106,155,204,.35);
+      background: rgba(106,155,204,.06);
+    }
+    .paper-card.is-origin:hover{
+      border-color: rgba(106,155,204,.55);
+      box-shadow: 0 10px 26px rgba(106,155,204,0.18);
+      background: rgba(106,155,204,.08);
+    }
+    .paper-idx{
+      width: 34px;
+      flex: 0 0 34px;
+      text-align:right;
+      padding-top: 2px;
+      font-family:'Poppins', ui-sans-serif, system-ui;
+      font-weight:800;
+      color: rgba(107,106,100,0.65);
+    }
+    .paper-card.is-origin .paper-idx{
+      color: var(--accent-2);
+    }
+    .paper-main{
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .paper-title{
+      margin: 0;
+      font-family:'Poppins', ui-sans-serif, system-ui;
+      font-size: 18px;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+    }
+    .paper-title a{
+      text-decoration: none;
+    }
+    .paper-title a:hover{
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+      text-decoration-color: rgba(106,155,204,0.55);
+      color: var(--accent-2);
+    }
+    .paper-meta{
+      margin-top: 10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+      align-items:center;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-family:'Poppins', ui-sans-serif, system-ui;
+      font-weight: 800;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(107,106,100,0.95);
+      user-select:none;
+    }
+    .badge.origin{
+      background: var(--pearl-label-bg);
+      border-color: var(--pearl-label-border);
+      color: var(--pearl-label-text);
+    }
+    .badge.source{
+      background: rgba(20,20,19,0.04);
+    }
+    .badge.year{
+      background: rgba(217,119,87,0.10);
+      border-color: rgba(217,119,87,0.22);
+      color: var(--accent);
+    }
+
+    .paper-action{
+      flex: 0 0 auto;
+      padding-top: 2px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:flex-end;
+    }
+    .paper-action a{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background:#fff;
+      font-family:'Poppins', ui-sans-serif, system-ui;
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--text);
+      box-shadow: 0 4px 10px rgba(20,20,19,0.05);
+      transition: box-shadow .25s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+      white-space: nowrap;
+    }
+    .paper-action a:hover{
+      transform: translateY(-1px);
+      border-color: rgba(106,155,204,0.5);
+      box-shadow: 0 0 0 3px rgba(106,155,204,0.14);
+      color: var(--accent-2);
+    }
+    .paper-action svg{ width: 16px; height: 16px; }
+
+    .empty{
+      padding: 18px 20px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .empty strong{ color: var(--text); }
+
+    .note{
+      padding: 18px 20px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .note a{
+      color: var(--accent-2);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    @media (max-width: 760px){
+      .paper-card{
+        flex-direction: column;
+        gap: 12px;
+      }
+      .paper-idx{ display:none; }
+      .paper-action{ width:100%; }
+      .paper-action a{
+        width:100%;
+        justify-content:center;
+      }
+      .toolbar-left{ min-width: 0; }
+    }
+  </style>
+</head>
+<body class="papers">
+
+  <div class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="./index.html" aria-label="nano-PEARL Home">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 12c5-9 11-9 16 0" stroke="url(#g1)" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M4 12c5 9 11 9 16 0" stroke="url(#g2)" stroke-width="2.2" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="g1" x1="4" x2="20" y1="12" y2="12">
+              <stop stop-color="#9AE6B4"/><stop offset="1" stop-color="#8AB4F8"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="4" x2="20" y1="12" y2="12">
+              <stop stop-color="#8AB4F8"/><stop offset="1" stop-color="#9AE6B4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="sig">nano-PEARL</span>
+      </a>
+      <nav class="nav-links" role="navigation" aria-label="Primary">
+        <a href="./index.html" class="">Introduction</a>
+        <a href="./quickstart.html" class="">Quick Start</a>
+        <a href="./benchmark.html" class="">BenchMark</a>
+        <a href="./faqs.html" class="">FAQs</a>
+        <a href="./papers.html" class="active">Papers</a>
+      </nav>
+    </div>
+  </div>
+
+  <section class="page-hero">
+    <div class="container" style="padding:42px 24px 28px">
+      <div class="kicker">Research</div>
+      <h1>PEARL Paper Collection</h1>
+      <p class="sub">A curated timeline of follow-up work inspired by PEARL and Parallel Speculative Decoding.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="wrap">
+
+      <div class="card papers-toolbar reveal">
+        <div class="toolbar-left">
+          <h2>Timeline</h2>
+          <p class="subtitle"><span id="paper-showing">–</span> papers shown • <span id="paper-total">–</span> total</p>
+          <div class="statline" aria-label="Origin paper link">
+            <span>Origin:</span>
+            <a href="https://arxiv.org/abs/2408.11850" target="_blank" rel="noreferrer noopener">arXiv:2408.11850</a>
+            <span class="dot" aria-hidden="true"></span>
+            <a href="https://github.com/smart-lty/nano-PEARL" target="_blank" rel="noreferrer noopener">Contribute</a>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <div class="search" role="search">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input id="paper-search" type="search" placeholder="Search titles…" autocomplete="off" />
+            <button id="paper-clear" class="btn-clear" type="button" aria-label="Clear filters">Clear</button>
+          </div>
+
+          <div class="select">
+            <label for="paper-year">Year</label>
+            <select id="paper-year" aria-label="year"></select>
+          </div>
+
+          <div class="select">
+            <label for="paper-source">Source</label>
+            <select id="paper-source" aria-label="source"></select>
+          </div>
+
+          <div class="select" style="min-width: 240px;">
+            <label for="paper-sort">Sort</label>
+            <select id="paper-sort" aria-label="sort order">
+              <option value="asc">Oldest → Newest</option>
+              <option value="desc">Newest → Oldest</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="paper-list" class="paper-list"></div>
+
+      <div class="card note">
+        The speculative decoding ecosystem is evolving quickly. If we missed a PEARL-style follow-up, feel free to open an issue or submit a PR on
+        <a href="https://github.com/smart-lty/nano-PEARL" target="_blank" rel="noreferrer noopener">GitHub</a>.
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      nano-PEARL • © 2025
+    </div>
+  </footer>
+
+  <script>
+    const RAW_PAPERS = [
+      {
+        id: "pearl",
+        title: "PEARL: Parallel Speculative Decoding with Adaptive Draft Length",
+        url: "https://arxiv.org/abs/2408.11850",
+        source: "arXiv",
+        year: "2024",
+        isHighlight: true
+      },
+      {
+        id: "amusd",
+        title: "AMUSD: Asynchronous Multi-Device Speculative Decoding for LLM Acceleration",
+        url: "https://arxiv.org/abs/2410.17375",
+        source: "arXiv",
+        year: "2024"
+      },
+      {
+        id: "duodecoding",
+        title: "DuoDecoding: Hardware-aware Heterogeneous Speculative Decoding with Dynamic Multi-Sequence Drafting",
+        url: "https://arxiv.org/abs/2503.00784",
+        source: "arXiv",
+        year: "2025"
+      },
+      {
+        id: "pipedec",
+        title: "PipeDec: Low-Latency Pipeline-based Inference with Dynamic Speculative Decoding towards Large-scale Models",
+        url: "https://export.arxiv.org/abs/2504.04104",
+        source: "Export arXiv",
+        year: "2025"
+      },
+      {
+        id: "specbranch",
+        title: "Speculative Decoding via Hybrid Drafting and Rollback-Aware Branch Parallelism (SpecBranch)",
+        url: "https://arxiv.org/abs/2506.01979",
+        source: "arXiv",
+        year: "2025"
+      },
+      {
+        id: "swiftspec",
+        title: "SwiftSpec: Ultra-Low Latency LLM Decoding by Scaling Asynchronous Speculative Decoding",
+        url: "https://arxiv.org/abs/2506.11309",
+        source: "arXiv",
+        year: "2025"
+      },
+      {
+        id: "flowspec",
+        title: "FlowSpec: Continuous Pipelined Speculative Decoding for Efficient Distributed LLM Inference",
+        url: "https://arxiv.org/abs/2507.02620",
+        source: "arXiv",
+        year: "2025"
+      },
+      {
+        id: "card",
+        title: "CARD: Cache-Assisted Parallel Speculative Decoding for Efficient Large Language Model Inference",
+        url: "https://arxiv.org/abs/2508.04462",
+        source: "arXiv",
+        year: "2025"
+      },
+      {
+        id: "pipeline-parallelism",
+        title: "Pipeline Parallelism is All You Need for Optimized Early-Exit Based Self-Speculative Decoding",
+        url: "https://arxiv.org/abs/2509.19368",
+        source: "arXiv",
+        year: "2025"
+      },
+      {
+        id: "mirror",
+        title: "Mirror Speculative Decoding: Breaking the Serial Barrier in LLM Inference",
+        url: "https://arxiv.org/abs/2510.13161",
+        source: "arXiv",
+        year: "2025"
+      },
+      {
+        id: "spec-spec",
+        title: "Speculative Speculative Decoding",
+        url: "https://openreview.net/forum?id=aL1Wnml9Ef",
+        source: "OpenReview",
+        year: "2025"
+      },
+      {
+        id: "fold",
+        title: "FOLD: Fast Correct Speculative Decoding",
+        url: "https://openreview.net/forum?id=zm35dmBdok",
+        source: "OpenReview",
+        year: "2025"
+      },
+      {
+        id: "double",
+        title: "Double: Breaking the Acceleration Limit via Double Retrieval Speculative Parallelism",
+        url: "https://arxiv.org/abs/2601.05524",
+        source: "arXiv",
+        year: "2026"
+      },
+      {
+        id: "hippo",
+        title: "HIPPO: Accelerating Video Large Language Models Inference via Holistic-aware Parallel Speculative Decoding",
+        url: "https://arxiv.org/abs/2601.08273",
+        source: "arXiv",
+        year: "2026"
+      },
+      {
+        id: "pacer",
+        title: "PACER: Blockwise Pre-verification for Speculative Decoding with Adaptive Length",
+        url: "https://arxiv.org/abs/2602.01274",
+        source: "arXiv",
+        year: "2026"
+      }
+    ];
+
+    function getPaperSortValue(paper){
+      const match = String(paper.url || "").match(/(\\d{2})(\\d{2})\\.\\d+/);
+      if(match){
+        const yy = Number(match[1]);
+        const mm = Number(match[2]);
+        const fullYear = yy + 2000;
+        return fullYear * 100 + mm;
+      }
+      if(paper.year){
+        return Number(paper.year) * 100;
+      }
+      return 999999;
+    }
+
+    function uniq(list){
+      return Array.from(new Set(list));
+    }
+
+    function normalize(s){
+      return String(s || "").toLowerCase();
+    }
+
+    function createBadge(text, kind){
+      const el = document.createElement("span");
+      el.className = "badge " + kind;
+      el.textContent = text;
+      return el;
+    }
+
+    function createPaperCard(paper, index){
+      const card = document.createElement("article");
+      card.className = "card paper-card" + (paper.isHighlight ? " is-origin" : "");
+
+      const idx = document.createElement("div");
+      idx.className = "paper-idx";
+      idx.textContent = String(index + 1) + ".";
+
+      const main = document.createElement("div");
+      main.className = "paper-main";
+
+      const title = document.createElement("h3");
+      title.className = "paper-title";
+      const link = document.createElement("a");
+      link.href = paper.url;
+      link.target = "_blank";
+      link.rel = "noreferrer noopener";
+      link.textContent = paper.title;
+      title.appendChild(link);
+      main.appendChild(title);
+
+      const meta = document.createElement("div");
+      meta.className = "paper-meta";
+      if(paper.isHighlight){
+        meta.appendChild(createBadge("Origin", "origin"));
+      }
+      meta.appendChild(createBadge(paper.source || "Unknown", "source"));
+      if(paper.year){
+        meta.appendChild(createBadge(paper.year, "year"));
+      }
+      main.appendChild(meta);
+
+      const action = document.createElement("div");
+      action.className = "paper-action";
+      const btn = document.createElement("a");
+      btn.href = paper.url;
+      btn.target = "_blank";
+      btn.rel = "noreferrer noopener";
+      btn.innerHTML = '<span>Open</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      action.appendChild(btn);
+
+      card.appendChild(idx);
+      card.appendChild(main);
+      card.appendChild(action);
+      return card;
+    }
+
+    (function initPapers(){
+      const listEl = document.getElementById("paper-list");
+      const totalEl = document.getElementById("paper-total");
+      const showingEl = document.getElementById("paper-showing");
+      const searchEl = document.getElementById("paper-search");
+      const yearEl = document.getElementById("paper-year");
+      const sourceEl = document.getElementById("paper-source");
+      const sortEl = document.getElementById("paper-sort");
+      const clearEl = document.getElementById("paper-clear");
+
+      const papers = RAW_PAPERS.slice();
+
+      // Build filter options
+      const years = uniq(papers.map(p => p.year).filter(Boolean)).sort();
+      const sources = uniq(papers.map(p => p.source).filter(Boolean)).sort();
+
+      yearEl.innerHTML = '<option value="__all__">All</option>' + years.map(y => '<option value="' + y + '">' + y + '</option>').join("");
+      sourceEl.innerHTML = '<option value="__all__">All</option>' + sources.map(s => '<option value="' + s + '">' + s + '</option>').join("");
+
+      function getFiltered(){
+        const q = normalize(searchEl.value).trim();
+        const y = yearEl.value;
+        const s = sourceEl.value;
+        const dir = sortEl.value;
+
+        let out = papers.filter(p => {
+          if(y !== "__all__" && String(p.year || "") !== y) return false;
+          if(s !== "__all__" && String(p.source || "") !== s) return false;
+          if(q){
+            const hay = normalize(p.title) + " " + normalize(p.id);
+            if(!hay.includes(q)) return false;
+          }
+          return true;
+        });
+
+        out.sort((a, b) => getPaperSortValue(a) - getPaperSortValue(b));
+        if(dir === "desc") out.reverse();
+        return out;
+      }
+
+      function render(){
+        const filtered = getFiltered();
+        listEl.innerHTML = "";
+
+        totalEl.textContent = String(papers.length);
+        showingEl.textContent = String(filtered.length);
+
+        if(!filtered.length){
+          const empty = document.createElement("div");
+          empty.className = "card empty";
+          empty.innerHTML = "<strong>No matches.</strong> Try clearing filters or searching with fewer keywords.";
+          listEl.appendChild(empty);
+          return;
+        }
+
+        filtered.forEach((p, i) => {
+          listEl.appendChild(createPaperCard(p, i));
+        });
+      }
+
+      function clear(){
+        searchEl.value = "";
+        yearEl.value = "__all__";
+        sourceEl.value = "__all__";
+        sortEl.value = "asc";
+        render();
+      }
+
+      searchEl.addEventListener("input", render);
+      yearEl.addEventListener("change", render);
+      sourceEl.addEventListener("change", render);
+      sortEl.addEventListener("change", render);
+      clearEl.addEventListener("click", clear);
+
+      render();
+    })();
+  </script>
+
+  <script src="./site.js"></script>
+</body>
+</html>
